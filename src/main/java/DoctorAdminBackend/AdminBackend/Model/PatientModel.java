@@ -20,10 +20,10 @@ import lombok.Data;
 public class PatientModel {
 
     @Id
-@GeneratedValue(generator = "uuid")
-@GenericGenerator(name = "uuid", strategy = "uuid2")
-@Column(name = "patientId")
-private String patientId;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column(name = "patientId")
+    private String patientId;
 
     @Column(name = "patientName")
     private String patientName;
