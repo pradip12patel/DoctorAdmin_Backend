@@ -45,7 +45,7 @@ public class PatientServiceIMPL implements PatientService {
     // //     Optional<PatientModel> pro = Optional.of(patientrepo.findById(id));
 
     // //     return patientrepo.findById(id);
-    // // }
+    // // } 
 
     // @Override
     // public PatientModel updatePatient(PatientModel patient, long id) {

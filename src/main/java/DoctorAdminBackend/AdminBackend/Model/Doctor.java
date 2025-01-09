@@ -3,17 +3,20 @@ package DoctorAdminBackend.AdminBackend.Model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "doctors")
 public class Doctor {
 
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private Long doctorId;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID id;
 
     @Column(name = "doctor_name", nullable = false)
     private String doctorName;
@@ -31,15 +34,17 @@ public class Doctor {
     private String status;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<PatientModel> patients;
 
-    // Getters and Setters
-    public Long getDoctorId() {
-        return doctorId;
-    }
+   // Getter for id
+   public UUID getId() {
+    return id;
+     }
 
-    public void setDoctorId(Long doctorId) {
-        this.doctorId = doctorId;
+// Setter for id
+    public void setId(UUID id) {
+    this.id = id;
     }
 
     public String getDoctorName() {
