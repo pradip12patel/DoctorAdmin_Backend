@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,10 @@ import org.springframework.stereotype.Service;
 import DoctorAdminBackend.AdminBackend.Model.Doctor;
 import DoctorAdminBackend.AdminBackend.Model.PatientModel;
 import DoctorAdminBackend.AdminBackend.Reposotiry.DoctorRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class DoctorService {
+public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.DoctorService{
 
 
     private final DoctorRepository doctorRepository;
@@ -62,6 +64,49 @@ public List<Map<String, Object>> getDoctorsWithPatients() {
 
     return result;
 }
+
+public Doctor updateStatus(UUID doctorId, boolean status) {
+    // Find the doctor by their ID
+    Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
+    
+    // Update the doctor's status
+    doctor.setStatus(status);
+    
+    // Save the updated doctor object to the repository and return it
+    return doctorRepository.save(doctor);
+
+
+}
+
+
+    // Method to update earnings for a specific doctor
+    public Doctor updateDoctorEarnings(UUID doctorId) {
+        // Find the doctor by their ID
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
+
+        // Calculate total earnings for the doctor
+        double totalEarnings = calculateTotalEarnings(doctor);
+
+        // Update the doctor's earnings
+        doctor.setEarnings(totalEarnings);
+
+        // Save the updated doctor entity
+        return doctorRepository.save(doctor);
+    }
+
+    private double calculateTotalEarnings(Doctor doctor) {
+        double totalEarnings = 0.0;
+        
+        // Iterate through the doctor's patients and sum their paid amounts
+        for (PatientModel patient : doctor.getPatients()) {
+            totalEarnings += patient.getPaid();
+        }
+
+        return totalEarnings;
+    }
+
 
 
 

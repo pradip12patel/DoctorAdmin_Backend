@@ -48,7 +48,7 @@ public class PatientModel {
     @Column(name = "paid", nullable = false)
     private double paid;
 
-    @Column(name = "imageurl")
+    @Column(name = "imageurl", nullable = false)
     private String imageurl;
 
     private String date;       // Format: "5 Nov 2019"

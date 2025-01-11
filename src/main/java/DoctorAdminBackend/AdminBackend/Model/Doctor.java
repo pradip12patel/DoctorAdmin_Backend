@@ -31,12 +31,12 @@ public class Doctor {
     private Double earnings;
 
     @Column(name = "status")
-    private String status;
+    private boolean status;
     
     @Column(name = "imageurl")
     private String imageurl;
 
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<PatientModel> patients;
 
@@ -82,11 +82,11 @@ public class Doctor {
         this.earnings = earnings;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 

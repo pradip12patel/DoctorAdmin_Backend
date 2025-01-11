@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +28,7 @@ import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.FileStorageService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.PatientServiceIMPL;
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api")
@@ -47,10 +50,31 @@ public class DoctorController {
     
         return ResponseEntity.ok(response);
     }
+
+    @CrossOrigin(origins = "http://localhost:8084")
+    @PatchMapping("/{doctorId}/status")
+    public ResponseEntity<Doctor> updateDoctorStatus(
+            @PathVariable UUID doctorId,
+            @RequestBody Doctor statusUpdateRequest) {
+    
+        // Ensure the status is valid (it should be true or false, not null)
+        if (statusUpdateRequest == null
+        ) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    
+        // Call the service to update the doctor's status and return the updated doctor
+        Doctor updatedDoctor = doctorService.updateStatus(doctorId, statusUpdateRequest.getStatus());
+    
+        // Return the updated doctor object
+        return ResponseEntity.ok(updatedDoctor);
+    }
+    
+
         
-     @Autowired
-    private  PatientServiceIMPL patientService;
-       
+    @Autowired
+    private PatientServiceIMPL patientService;
+      
     public DoctorController(PatientServiceIMPL patientService)  {
 
           this.patientService = patientService;
@@ -124,8 +148,21 @@ public class DoctorController {
         return ResponseEntity.ok(response);
     }
     
+   
 
-
+    // Endpoint to update earnings for a specific doctor
+    @PutMapping("/{doctorId}/update-earnings")
+    public ResponseEntity<Doctor> updateDoctorEarnings(@PathVariable("doctorId") UUID doctorId) {
+        try {
+            // Update the earnings for the doctor
+            Doctor updatedDoctor = doctorService.updateDoctorEarnings(doctorId);
+            
+            // Return the updated doctor entity with the new earnings
+            return ResponseEntity.ok(updatedDoctor);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
     
 }
 

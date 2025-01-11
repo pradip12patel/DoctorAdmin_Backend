@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,10 @@ import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 import DoctorAdminBackend.AdminBackend.Service.PatientService;
 
 @Service
-public class PatientServiceIMPL  {
+public class PatientServiceIMPL implements PatientService{
 
      @Autowired
-    private PatientRepository patientRepository;
+    public PatientRepository patientRepository;
 
    // Constructor injection
     public PatientServiceIMPL(PatientRepository patientRepository) {
@@ -35,56 +36,69 @@ public class PatientServiceIMPL  {
         return patientRepository.save(patient);
     }
 
-    
 
-    // @Override
-    // public PatientModel savePatient(PatientModel patient) {
-    //     return patientrepo.save(patient);
-    // }
 
-    // @Override
-    // public List<PatientModel> savesPatient(PatientModel[] newPatients) {
-    //     // Convert array to a list correctly
-    //     List<PatientModel> savedPatients = Arrays.asList(newPatients);
-    //     return patientrepo.saveAll(savedPatients);
-    // }
 
-    // @Override
-    // public List<PatientModel> getAllPatients() {
 
-    //     return patientrepo.findAll();
-    // }
-
-    // // @Override
-    // // public PatientModel getPatientById(long id) {
-    // //     // Use Optional's orElseThrow to simplify null check
-    // //     Optional<PatientModel> pro = Optional.of(patientrepo.findById(id));
-
-    // //     return patientrepo.findById(id);
-    // // } 
-
-    // @Override
-    // public PatientModel updatePatient(PatientModel patient, long id) {
-    //     PatientModel existingPatient = patientrepo.findById(id);
-    //     // Update fields of the existing patient
-    //     existingPatient.setPatientName(patient.getPatientName());
-    //     existingPatient.setAge(patient.getAge());
-    //     existingPatient.setAddress(patient.getAddress());
-    //     existingPatient.setPhone(patient.getPhone());
-    //     existingPatient.setLastVisit(patient.getLastVisit());
-    //     existingPatient.setPaid(patient.getPaid());
-    //     return patientrepo.save(existingPatient);
-    // }
-
-    // @Override
-    // public void deletePatient(long id) {
-    //     if (patientrepo.existsById(id)) {
-    //         patientrepo.deleteById(id);
-    //     } else {
-    //         throw new RuntimeException("Patient not found with ID: " + id);
-    //     }
-    // }
 
     
+
+    @Override
+    public PatientModel savePatient(PatientModel patient) {
+        return patientRepository.save(patient);
+    }
+
+    @Override
+    public List<PatientModel> savesPatient(PatientModel[] newPatients) {
+        // Convert array to a list correctly
+        List<PatientModel> savedPatients = Arrays.asList(newPatients);
+        return patientRepository.saveAll(savedPatients);
+    }
+
+    @Override
+    public List<PatientModel> getAllPatients() {
+
+        return patientRepository.findAll();
+    }
+
+    @Override
+public PatientModel getPatientbyID(UUID id) {
+    // Use Optional's orElseThrow to simplify null check
+    Optional<PatientModel> patientOpt = patientRepository.findById(id);
+    return patientOpt.orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+}
+
+    @Override
+    public PatientModel updatePatient(PatientModel patient, UUID id) {
+        PatientModel existingPatient = patientRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+        // Update fields of the existing patient
+        existingPatient.setPatientName(patient.getPatientName());
+        existingPatient.setAge(patient.getAge());
+        existingPatient.setAddress(patient.getAddress());
+        existingPatient.setPhone(patient.getPhone());
+        existingPatient.setLastVisit(patient.getLastVisit());
+        existingPatient.setPaid(patient.getPaid());
+        existingPatient.setApointmentSlot(patient.getApointmentSlot()); // Ensure this field is set
+        existingPatient.setImageURL(patient.getImageURL());  
+
+
+        return patientRepository.save(existingPatient);
+    }
+
+    @Override
+public void deletePatient(UUID id) {
+    Optional<PatientModel> delete = patientRepository.findById(id);
+
+    if (delete.isPresent()) { // Check if the Optional contains a value
+        patientRepository.deleteById(id);
+    } else {
+        throw new RuntimeException("Patient not found with ID: " + id);
+    }
+}
 
 }
+
+    
+
+
