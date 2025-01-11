@@ -36,6 +36,8 @@ public List<Map<String, Object>> getDoctorsWithPatients() {
         doctorData.put("memberSince", doctor.getMemberSince());
         doctorData.put("earnings", doctor.getEarnings());
         doctorData.put("status", doctor.getStatus());
+        System.out.println("Doctor Image URL: " + doctor.getImageURL());
+        doctorData.put("ImageUrl", doctor.getImageURL());
 
         // Map associated patients
         List<Map<String, Object>> patients = new ArrayList<>();
@@ -48,6 +50,9 @@ public List<Map<String, Object>> getDoctorsWithPatients() {
             patientData.put("phone", patient.getPhone());
             patientData.put("lastVisit", patient.getLastVisit());
             patientData.put("paid", patient.getPaid());
+            patientData.put("ApointmentSlot", patient.getApointmentSlot());
+            System.out.println("Patient Image URL: " + patient.getImageURL());
+            patientData.put("ImageUrl", patient.getImageURL());
             patients.add(patientData);
         }
 

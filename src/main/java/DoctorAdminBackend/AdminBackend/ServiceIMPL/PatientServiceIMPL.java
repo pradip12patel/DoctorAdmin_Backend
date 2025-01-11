@@ -1,25 +1,41 @@
 package DoctorAdminBackend.AdminBackend.ServiceIMPL;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import DoctorAdminBackend.AdminBackend.Model.PatientModel;
-import DoctorAdminBackend.AdminBackend.Reposotiry.PatientReposotiry;
+import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 import DoctorAdminBackend.AdminBackend.Service.PatientService;
 
 @Service
-public class PatientServiceIMPL implements PatientService {
+public class PatientServiceIMPL  {
 
-    // private final PatientReposotiry patientrepo;
+     @Autowired
+    private PatientRepository patientRepository;
 
-    // // Constructor injection
-    // public PatientServiceIMPL(PatientReposotiry patientrepo) {
-    //     super();
-    //     this.patientrepo = patientrepo;
-    // }
+   // Constructor injection
+    public PatientServiceIMPL(PatientRepository patientRepository) {
+        
+        this.patientRepository = patientRepository;
+    }
+
+    public PatientModel setAppointmentSlot(PatientModel request) {
+        PatientModel patient = patientRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + request.getId()));
+
+                patient.setFormattedapointmentslot(request.getDate(), request.getStartTime(), request.getEndTime());
+        return patientRepository.save(patient);
+    }
+
+    
 
     // @Override
     // public PatientModel savePatient(PatientModel patient) {
@@ -68,4 +84,7 @@ public class PatientServiceIMPL implements PatientService {
     //         throw new RuntimeException("Patient not found with ID: " + id);
     //     }
     // }
+
+    
+
 }

@@ -32,6 +32,9 @@ public class Doctor {
 
     @Column(name = "status")
     private String status;
+    
+    @Column(name = "imageurl")
+    private String imageurl;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -85,6 +88,14 @@ public class Doctor {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getImageURL() {
+        return  imageurl;
+    }
+
+    public void setImageURL(String imageurl) {
+        this.imageurl = imageurl;
     }
 
     public List<PatientModel> getPatients() {
