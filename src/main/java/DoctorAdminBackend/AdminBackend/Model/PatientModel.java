@@ -1,6 +1,7 @@
 package DoctorAdminBackend.AdminBackend.Model;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -16,6 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -62,6 +64,20 @@ public class PatientModel {
     @JoinColumn(name = "doctor_id", referencedColumnName = "id", nullable = false) // Maps to Doctor's primary key
     @JsonBackReference
     private Doctor doctor;
+
+    @OneToMany(mappedBy = "patient")
+    private List<Appointment> appointments;
+
+    // Getter method for appointments
+   public List<Appointment> getAppointments() {
+    return appointments;
+   }
+
+// Setter method for appointments
+   public void setAppointments(List<Appointment> appointments) {
+    this.appointments = appointments;
+  }
+
 
 
     // Getters and Setters

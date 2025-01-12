@@ -1,5 +1,8 @@
 package DoctorAdminBackend.AdminBackend.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+
 import DoctorAdminBackend.AdminBackend.Model.Doctor;
 import DoctorAdminBackend.AdminBackend.Model.PatientModel;
 import DoctorAdminBackend.AdminBackend.Reposotiry.DoctorRepository;
@@ -32,137 +37,173 @@ import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:8084")
 public class DoctorController {
 
-    @Autowired
-    private DoctorService doctorService;
-
-    @CrossOrigin(origins = "http://localhost:8084")
-    @GetMapping("/doctor-with-patients")
-    public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
-        List<Map<String, Object>> doctorsWithPatients = doctorService.getDoctorsWithPatients();
-    
-        // Create the response map
-        Map<String, Object> response = new LinkedHashMap<>(); // Preserve insertion order
-        response.put("status", 200);
-        response.put("message", "Doctors with associated patients retrieved successfully");
-        response.put("data", doctorsWithPatients);
-    
-        return ResponseEntity.ok(response);
-    }
-
-    @CrossOrigin(origins = "http://localhost:8084")
-    @PatchMapping("/{doctorId}/status")
-    public ResponseEntity<Doctor> updateDoctorStatus(
-            @PathVariable UUID doctorId,
-            @RequestBody Doctor statusUpdateRequest) {
-    
-        // Ensure the status is valid (it should be true or false, not null)
-        if (statusUpdateRequest == null
-        ) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    
-        // Call the service to update the doctor's status and return the updated doctor
-        Doctor updatedDoctor = doctorService.updateStatus(doctorId, statusUpdateRequest.getStatus());
-    
-        // Return the updated doctor object
-        return ResponseEntity.ok(updatedDoctor);
-    }
-    
-
-        
-    @Autowired
-    private PatientServiceIMPL patientService;
-      
-    public DoctorController(PatientServiceIMPL patientService)  {
-
-          this.patientService = patientService;
-    }
-
-    
-    
-    @CrossOrigin(origins = "http://localhost:8084")
-    @PostMapping("/set-apointment")
-    public ResponseEntity<PatientModel> setAppointmentSlot(@RequestBody PatientModel request) {
-        PatientModel updatedPatient = patientService.setAppointmentSlot(request);
-        return ResponseEntity.ok(updatedPatient);
-    }
-       
+    private final DoctorService doctorService;
+    private final PatientServiceIMPL patientService;
+    private final FileStorageService fileStorageService;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
-    private final FileStorageService fileStorageService;
-    
+
     @Autowired
-    public DoctorController(FileStorageService fileStorageService, 
-                            DoctorRepository doctorRepository, 
-                            PatientRepository patientRepository) {
+    public DoctorController(
+        DoctorService doctorService, 
+        PatientServiceIMPL patientService,
+        FileStorageService fileStorageService, 
+        DoctorRepository doctorRepository, 
+        PatientRepository patientRepository
+    ) {
+        this.doctorService = doctorService;
+        this.patientService = patientService;
         this.fileStorageService = fileStorageService;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
     }
-    
-    @CrossOrigin(origins = "http://localhost:8084")
-    @PostMapping("/upload-image/{type}/{id}")
-    public ResponseEntity<Map<String, Object>> uploadImage(
-            @PathVariable String type, 
-            @PathVariable UUID id, // Changed type to UUID
-            @RequestParam("file") MultipartFile file) {
-    
-        // Store the file and get the URL
-        String imageUrl = fileStorageService.storeFile(file); 
-    
-        // Handle doctor type
-        if ("doctor".equalsIgnoreCase(type)) {
-            Optional<Doctor> optionalDoctor = doctorRepository.findById(id); // Fetch doctor by ID
-            if (optionalDoctor.isPresent()) { 
-                Doctor doctor = optionalDoctor.get();
-                doctor.setImageURL(imageUrl); // Set the image URL
-                doctorRepository.save(doctor); // Save updated doctor
-            } else {
-                throw new RuntimeException("Doctor not found with ID: " + id); // Handle doctor not found
-            }
-        } 
-        // Handle patient type
-        else if ("patient".equalsIgnoreCase(type)) {
-            Optional<PatientModel> optionalPatient = patientRepository.findById(id); // Fetch patient by ID
-            if (optionalPatient.isPresent()) {
-                PatientModel patient = optionalPatient.get();
-                patient.setImageURL(imageUrl); // Set the image URL
-                patientRepository.save(patient); // Save updated patient
-            } else {
-                throw new RuntimeException("Patient not found with ID: " + id); // Handle patient not found
-            }
-        } 
-        // Handle invalid type
-        else {
-            throw new IllegalArgumentException("Invalid type specified. Must be either 'doctor' or 'patient'.");
-        }
-    
-        // Create response map
+
+    // 1. GET - Retrieve all doctors with patients
+    @GetMapping("/doctor-with-patients")
+    public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
+        List<Map<String, Object>> doctorsWithPatients = doctorService.getDoctorsWithPatients();
+
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
-        response.put("message", "Image uploaded successfully");
-        response.put("imageUrl", imageUrl);
-    
+        response.put("message", "Doctors and their associated patients retrieved successfully");
+        response.put("data", doctorsWithPatients);
+
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/doctor")
+    public ResponseEntity<Map<String, Object>> addDoctorWithImage(
+            @RequestParam("doctorName") String doctorName,
+            @RequestParam("specialization") String specialization,
+            @RequestParam("status") Boolean status,
+            @RequestParam("earnings") Double earnings,
+            @RequestParam("memberSince") String memberSince,
+            @RequestParam("isFeature") Boolean isFeature,
+            @RequestParam("file") MultipartFile file) {
+    
+        // Save the image and get its URL
+        String imageUrl = fileStorageService.storeFile(file);
+    
+        // Create and set up the doctor entity
+        Doctor doctor = new Doctor();
+        doctor.setDoctorName(doctorName);
+        doctor.setSpecialization(specialization);
+        doctor.setStatus(status);
+        doctor.setEarnings(earnings);
+    
+        // Convert memberSince string to LocalDateTime
+        LocalDateTime memberSinceDate = LocalDateTime.parse(memberSince);
+        doctor.setMemberSince(memberSinceDate);
+    
+        doctor.setFeature(isFeature);
+        doctor.setImageURL(imageUrl);
+    
+        // Call the service method to save the doctor entity
+        Doctor savedDoctor = doctorService.savedoctor(doctor);
+    
+        // Create the response map
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 201);
+        response.put("message", "Doctor created successfully with image");
+        response.put("data", savedDoctor);
+    
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    
+    
     
    
 
-    // Endpoint to update earnings for a specific doctor
-    @PutMapping("/{doctorId}/update-earnings")
-    public ResponseEntity<Doctor> updateDoctorEarnings(@PathVariable("doctorId") UUID doctorId) {
-        try {
-            // Update the earnings for the doctor
-            Doctor updatedDoctor = doctorService.updateDoctorEarnings(doctorId);
-            
-            // Return the updated doctor entity with the new earnings
-            return ResponseEntity.ok(updatedDoctor);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+    @PutMapping("/doctor/{doctorId}")
+    public ResponseEntity<Doctor> updateDoctorDetails(
+            @PathVariable UUID doctorId, 
+            @RequestBody Map<String, Object> updatedDetails) {
+    
+        // Fetch the doctor by ID
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
+    
+        // Update doctor details if present in the request body
+        if (updatedDetails.containsKey("doctorName")) {
+            doctor.setDoctorName((String) updatedDetails.get("doctorName"));
         }
+        if (updatedDetails.containsKey("specialization")) {
+            doctor.setSpecialization((String) updatedDetails.get("specialization"));
+        }
+        if (updatedDetails.containsKey("status")) {
+            doctor.setStatus((Boolean) updatedDetails.get("status"));
+        }
+        if (updatedDetails.containsKey("earnings")) {
+            doctor.setEarnings(((Number) updatedDetails.get("earnings")).doubleValue());
+        }
+        if (updatedDetails.containsKey("isFeature")) {
+            doctor.setFeature((Boolean) updatedDetails.get("isFeature"));
+        }
+        if (updatedDetails.containsKey("memberSince")) {
+            doctor.setMemberSince((LocalDateTime) updatedDetails.get("memberSince"));
+        }
+        if (updatedDetails.containsKey("imageURL")) {
+            doctor.setImageURL((String) updatedDetails.get("imageURL"));
+        }
+    
+        // Save the updated doctor details
+        doctorRepository.save(doctor);
+    
+        // Return the updated doctor details
+        return ResponseEntity.ok(doctor);
     }
     
-}
+    // 7. POST - Book an appointment (set appointment slot for a patient)
+    @PostMapping("/set-appointment")
+    public ResponseEntity<PatientModel> setAppointmentSlot(@RequestBody PatientModel request) {
+        PatientModel updatedPatient = patientService.setAppointmentSlot(request);
+        return ResponseEntity.ok(updatedPatient);
+    }
 
+    // // 8. POST - Upload image for doctor or patient
+    // @PostMapping("/upload-image/{type}/{id}")
+    // public ResponseEntity<Map<String, Object>> uploadImage(
+    //         @PathVariable String type, 
+    //         @PathVariable UUID id, 
+    //         @RequestParam("file") MultipartFile file) {
+
+    //     String imageUrl = fileStorageService.storeFile(file);
+
+    //     if ("doctor".equalsIgnoreCase(type)) {
+    //         Doctor doctor = doctorRepository.findById(id)
+    //                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
+    //         doctor.setImageURL(imageUrl);
+    //         doctorRepository.save(doctor);
+    //     } else if ("patient".equalsIgnoreCase(type)) {
+    //         PatientModel patient = patientRepository.findById(id)
+    //                 .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+    //         patient.setImageURL(imageUrl);
+    //         patientRepository.save(patient);
+    //     } else {
+    //         throw new IllegalArgumentException("Invalid type specified. Must be either 'doctor' or 'patient'.");
+    //     }
+
+    //     Map<String, Object> response = new LinkedHashMap<>();
+    //     response.put("status", 200);
+    //     response.put("message", "Image uploaded successfully");
+    //     response.put("imageUrl", imageUrl);
+
+    //     return ResponseEntity.ok(response);
+    // }
+
+    // 9. DELETE - Remove a doctor
+    @DeleteMapping("/doctor/{doctorId}")
+    public ResponseEntity<Map<String, String>> deleteDoctor(@PathVariable UUID doctorId) {
+        doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
+        doctorRepository.deleteById(doctorId);
+
+        Map<String, String> response = new LinkedHashMap<>();
+        response.put("message", "Doctor deleted successfully");
+        return ResponseEntity.ok(response);
+    }
+}

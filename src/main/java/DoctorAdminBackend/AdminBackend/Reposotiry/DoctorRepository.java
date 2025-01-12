@@ -22,7 +22,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
    "d.earnings AS earnings, " +
    "d.status AS doctorStatus, " +
    "d.imageurl AS imageurlDo, " +
-   "p.apointmentslot AS ApointmentSlot, " +
+   "a.appointment_date AS AppointmentSlot, " +  // Corrected field for appointment date
    "p.id AS patientId, " +
    "p.patient_name AS patientName, " +
    "p.age AS patientAge, " +
@@ -30,13 +30,16 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
    "p.phone AS patientPhone, " +
    "p.last_visit AS lastVisit, " +
    "p.paid AS patientPaid, " +
-   "p.imageurl AS imageurlPatient " +  // Removed the trailing comma here
+   "p.imageurl AS imageurlPatient " +
    "FROM doctors d " +
-   "LEFT JOIN patients p ON d.id = p.doctor_id", 
-nativeQuery = true)
+   "LEFT JOIN appointments a ON d.id = a.doctor_id " +  // Join doctors with appointments
+   "LEFT JOIN patients p ON a.patient_id = p.id", nativeQuery = true)
+
 
 List<Object[]> findAllDoctorsWithPatients();
 
    Optional<Doctor> findById(UUID id);
+
+   List<Doctor> findByIsFeature(boolean isFeature);
 
 }

@@ -40,6 +40,31 @@ public class Doctor {
     @JsonManagedReference
     private List<PatientModel> patients;
 
+    @OneToMany(mappedBy = "doctor")
+    private List<Appointment> appointments;
+
+    // Getter method for appointments
+    public List<Appointment> getAppointments() {
+    return appointments;
+   }
+
+// Setter method for appointments
+   public void setAppointments(List<Appointment> appointments) {
+    this.appointments = appointments;
+  }
+
+
+    @Column(name = "is_feature", nullable = false)
+    private boolean isFeature;
+
+    public boolean isFeature() {
+        return isFeature;
+    }
+
+    public void setFeature(boolean isFeature) {
+        this.isFeature = isFeature;
+    }
+
    // Getter for id
    public UUID getId() {
     return id;
