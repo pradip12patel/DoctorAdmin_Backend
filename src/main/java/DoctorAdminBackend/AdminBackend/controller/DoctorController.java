@@ -74,6 +74,34 @@ public class DoctorController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/doctor/{id}")
+public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) {
+    // Log a message to indicate the method is being called
+    System.out.println("Fetching doctor details for ID: " + id);
+
+    Map<String, Object> response = new LinkedHashMap<>();
+
+    try {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
+
+        // Add success message and doctor data to the response
+        response.put("status", "200");
+        response.put("message", "Doctor details fetched successfully.");
+        response.put("doctor", doctor);
+
+        return ResponseEntity.ok(response);
+    } catch (RuntimeException ex) {
+        System.out.println("Error: " + ex.getMessage()); // Log the error message
+
+        // Add error message to the response
+        response.put("message", "Doctor not found with ID: " + id);
+
+        return ResponseEntity.status(404).body(response); // Return 404 with the message
+    }
+}
+
+
     @PostMapping("/doctor")
     public ResponseEntity<Map<String, Object>> addDoctorWithImage(
             @RequestParam("doctorName") String doctorName,

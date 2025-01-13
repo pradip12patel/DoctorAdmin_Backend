@@ -22,6 +22,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
    "d.earnings AS earnings, " +
    "d.status AS doctorStatus, " +
    "d.imageurl AS imageurlDo, " +
+   "d.experience_years AS experience_years, " +
    "a.appointment_date AS AppointmentSlot, " +  // Corrected field for appointment date
    "p.id AS patientId, " +
    "p.patient_name AS patientName, " +

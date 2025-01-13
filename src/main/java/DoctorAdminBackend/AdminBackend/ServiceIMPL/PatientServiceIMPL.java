@@ -32,7 +32,7 @@ public class PatientServiceIMPL implements PatientService{
         PatientModel patient = patientRepository.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + request.getId()));
 
-                patient.setFormattedapointmentslot(request.getDate(), request.getStartTime(), request.getEndTime());
+              //  patient.setFormattedapointmentslot(request.getDate(), request.getStartTime(), request.getEndTime());
         return patientRepository.save(patient);
     }
 
@@ -79,7 +79,7 @@ public PatientModel getPatientbyID(UUID id) {
         existingPatient.setPhone(patient.getPhone());
         existingPatient.setLastVisit(patient.getLastVisit());
         existingPatient.setPaid(patient.getPaid());
-        existingPatient.setApointmentSlot(patient.getApointmentSlot()); // Ensure this field is set
+     //   existingPatient.setApointmentSlot(patient.getApointmentSlot()); // Ensure this field is set
         existingPatient.setImageURL(patient.getImageURL());  
 
 

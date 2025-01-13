@@ -53,12 +53,12 @@ public class PatientModel {
     @Column(name = "imageurl", nullable = false)
     private String imageurl;
 
-    private String date;       // Format: "5 Nov 2019"
-    private String startTime;  // Format: "11:00 AM"
-    private String endTime;
+    // private String date;       // Format: "5 Nov 2019"
+    // private String startTime;  // Format: "11:00 AM"
+    // private String endTime;
 
-    @Column(name = "apointmentslot", nullable = false)
-    private String apointmentslot;
+    // @Column(name = "apointmentslot", nullable = false)
+    // private String apointmentslot;
 
     @ManyToOne(fetch = FetchType.LAZY) // Use LAZY fetching for better performance
     @JoinColumn(name = "doctor_id", referencedColumnName = "id", nullable = false) // Maps to Doctor's primary key
@@ -130,18 +130,18 @@ public class PatientModel {
     }
 
     
-    public String getApointmentSlot() {
-        return apointmentslot;
-    }
+    // public String getApointmentSlot() {
+    //     return apointmentslot;
+    // }
 
-    public void setApointmentSlot(String apoitmentslot) {
-        this.apointmentslot = apoitmentslot;
-    }
+    // public void setApointmentSlot(String apoitmentslot) {
+    //     this.apointmentslot = apoitmentslot;
+    // }
 
-    // Method to set the slot using date and time
-    public void setFormattedapointmentslot(String date, String startTime, String endTime) {
-        this.apointmentslot = String.format("%s, %s - %s", date, startTime, endTime);
-    }
+    // // Method to set the slot using date and time
+    // public void setFormattedapointmentslot(String date, String startTime, String endTime) {
+    //     this.apointmentslot = String.format("%s, %s - %s", date, startTime, endTime);
+    // }
 
     public double getPaid() {
         return paid;

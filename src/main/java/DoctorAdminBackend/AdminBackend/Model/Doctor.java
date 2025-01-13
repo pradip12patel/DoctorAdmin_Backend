@@ -1,6 +1,8 @@
 package DoctorAdminBackend.AdminBackend.Model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +11,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+@Data
 @Entity
 @Table(name = "doctors")
 public class Doctor {
@@ -18,13 +21,13 @@ public class Doctor {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
 
-    @Column(name = "doctor_name", nullable = false)
+    @Column(name = "doctor_name")
     private String doctorName;
 
-    @Column(name = "specialization", nullable = false)
+    @Column(name = "specialization")
     private String specialization;
 
-    @Column(name = "member_since", nullable = false)
+    @Column(name = "member_since")
     private LocalDateTime memberSince;
 
     @Column(name = "earnings")
@@ -39,6 +42,17 @@ public class Doctor {
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<PatientModel> patients;
+
+    @Column(name = "experience_years", nullable = false)
+    private int experienceYears;
+
+   public int getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(int experienceYears) {
+        this.experienceYears = experienceYears;
+    }
 
     @OneToMany(mappedBy = "doctor")
     private List<Appointment> appointments;
