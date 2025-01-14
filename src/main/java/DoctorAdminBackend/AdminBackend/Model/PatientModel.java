@@ -78,6 +78,17 @@ public class PatientModel {
     this.appointments = appointments;
   }
 
+  @OneToMany(mappedBy =  "patient")
+   private List<Review> reviews;
+
+    public List<Review> getReviews() {
+        return reviews;
+       }
+    
+       public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+      }
+
 
 
     // Getters and Setters

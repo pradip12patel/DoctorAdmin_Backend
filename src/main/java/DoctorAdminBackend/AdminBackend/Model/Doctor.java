@@ -67,6 +67,17 @@ public class Doctor {
     this.appointments = appointments;
   }
 
+  @OneToMany(mappedBy =  "doctor")
+   private List<Review> reviews;
+
+    public List<Review> getReviews() {
+        return reviews;
+       }
+    
+       public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+      }
+
 
     @Column(name = "is_feature", nullable = false)
     private boolean isFeature;
