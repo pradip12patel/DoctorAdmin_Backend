@@ -38,7 +38,7 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
 
     public List<Map<String, Object>> getDoctorsWithPatients() {
         List<Doctor> doctors = doctorRepository.findAll(); // Fetch all doctors with their patients
-
+    
         List<Map<String, Object>> result = new ArrayList<>();
         for (Doctor doctor : doctors) {
             Map<String, Object> doctorData = new LinkedHashMap<>();
@@ -51,7 +51,7 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
             doctorData.put("experience_years", doctor.getExperienceYears());
             doctorData.put("ImageUrl", doctor.getImageURL());
             doctorData.put("isFeature", doctor.isFeature());
-
+    
             // Map patients associated with the doctor
             List<Map<String, Object>> patients = new ArrayList<>();
             for (PatientModel patient : doctor.getPatients()) {
@@ -64,30 +64,30 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
                 patientData.put("lastVisit", patient.getLastVisit());
                 patientData.put("paid", patient.getPaid());
                 patientData.put("ImageUrl", patient.getImageURL());
-
+    
                 // Map associated appointments for each patient
                 List<Map<String, Object>> appointments = new ArrayList<>();
                 for (Appointment appointment : patient.getAppointments()) {
-                Map<String, Object> appointmentData = new LinkedHashMap<>();
-                appointmentData.put("appointmentId", appointment.getId().toString());
+                    Map<String, Object> appointmentData = new LinkedHashMap<>();
+                    appointmentData.put("appointmentId", appointment.getId().toString());
                 appointmentData.put("AppointmentSlot", appointment.getFormattedAppointmentDate());
-                appointments.add(appointmentData);
-}
-
+                    appointments.add(appointmentData);
+                }
+    
                 // Add appointments to patient data
                 patientData.put("appointments", appointments);
                 patients.add(patientData);
             }
-
+    
             // Add patients to doctor data
             doctorData.put("patients", patients);
-
+    
             result.add(doctorData); // Add doctor to result
         }
-
+    
         return result;
     }
-
+    
     public Doctor updateStatus(UUID doctorId, boolean status) {
         // Find the doctor by their ID
         Doctor doctor = doctorRepository.findById(doctorId)
