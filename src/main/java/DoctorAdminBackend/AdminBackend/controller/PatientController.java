@@ -22,13 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @RequestMapping("/patient")
 @RestController
-public class PatientServicecontroller {
+public class PatientController {
     
    private PatientService patientservice;
 
 
     @Autowired
-    public PatientServicecontroller(PatientService patientservice)  {
+    public PatientController(PatientService patientservice)  {
 
         this.patientservice = patientservice;
     }

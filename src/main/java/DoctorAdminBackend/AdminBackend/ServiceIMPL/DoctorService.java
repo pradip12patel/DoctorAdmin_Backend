@@ -48,6 +48,7 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
             doctorData.put("memberSince", doctor.getMemberSince());
             doctorData.put("earnings", doctor.getEarnings());
             doctorData.put("status", doctor.getStatus());
+            doctorData.put("experience_years", doctor.getExperienceYears());
             doctorData.put("ImageUrl", doctor.getImageURL());
             doctorData.put("isFeature", doctor.isFeature());
 
