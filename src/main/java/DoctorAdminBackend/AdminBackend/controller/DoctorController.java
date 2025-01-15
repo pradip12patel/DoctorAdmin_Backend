@@ -131,11 +131,9 @@ public ResponseEntity<Map<String, Object>> addDoctorWithImage(
     doctor.setExperienceYears(experience_years);
     doctor.setabout(about);
     doctor.setcertification(certification);
-
     // Convert memberSince string to LocalDateTime
     LocalDateTime memberSinceDate = LocalDateTime.parse(memberSince);
     doctor.setMemberSince(memberSinceDate);
-
     doctor.setFeature(isFeature);
     doctor.setImageURL(imageUrl);
 
