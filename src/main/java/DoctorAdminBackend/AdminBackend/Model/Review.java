@@ -29,7 +29,7 @@ public class Review {
     private UUID id;
 
     @Column(name = "Rating")
-    private int rating;
+    private double rating;
 
     @Column(name = "description")
     private String description;
@@ -56,11 +56,11 @@ public class Review {
     }
 
     // Getter and Setter for rating
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 

@@ -30,6 +30,7 @@ import DoctorAdminBackend.AdminBackend.Model.Doctor;
 import DoctorAdminBackend.AdminBackend.Model.PatientModel;
 import DoctorAdminBackend.AdminBackend.Reposotiry.DoctorRepository;
 import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
+import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorDetailData;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.FileStorageService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.PatientServiceIMPL;
@@ -45,6 +46,7 @@ public class DoctorController {
     private final FileStorageService fileStorageService;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final DoctorDetailData doctorDetailData;
 
     @Autowired
     public DoctorController(
@@ -52,19 +54,21 @@ public class DoctorController {
         PatientServiceIMPL patientService,
         FileStorageService fileStorageService, 
         DoctorRepository doctorRepository, 
-        PatientRepository patientRepository
+        PatientRepository patientRepository,
+        DoctorDetailData doctorDetailData
     ) {
         this.doctorService = doctorService;
         this.patientService = patientService;
         this.fileStorageService = fileStorageService;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
+        this.doctorDetailData= doctorDetailData;
     }
 
     // 1. GET - Retrieve all doctors with patients
     @GetMapping("/doctor-with-patients")
     public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
-        List<Map<String, Object>> doctorsWithPatients = doctorService.getDoctorsWithPatients();
+        List<Map<String, Object>> doctorsWithPatients = doctorDetailData.getDoctorsWithPatients();
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -102,44 +106,51 @@ public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) 
 }
 
 
-    @PostMapping("/doctor")
-    public ResponseEntity<Map<String, Object>> addDoctorWithImage(
-            @RequestParam("doctorName") String doctorName,
-            @RequestParam("specialization") String specialization,
-            @RequestParam("status") Boolean status,
-            @RequestParam("earnings") Double earnings,
-            @RequestParam("memberSince") String memberSince,
-            @RequestParam("isFeature") Boolean isFeature,
-            @RequestParam("file") MultipartFile file) {
-    
-        // Save the image and get its URL
-        String imageUrl = fileStorageService.storeFile(file);
-    
-        // Create and set up the doctor entity
-        Doctor doctor = new Doctor();
-        doctor.setDoctorName(doctorName);
-        doctor.setSpecialization(specialization);
-        doctor.setStatus(status);
-        doctor.setEarnings(earnings);
-    
-        // Convert memberSince string to LocalDateTime
-        LocalDateTime memberSinceDate = LocalDateTime.parse(memberSince);
-        doctor.setMemberSince(memberSinceDate);
-    
-        doctor.setFeature(isFeature);
-        doctor.setImageURL(imageUrl);
-    
-        // Call the service method to save the doctor entity
-        Doctor savedDoctor = doctorService.savedoctor(doctor);
-    
-        // Create the response map
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", 201);
-        response.put("message", "Doctor created successfully with image");
-        response.put("data", savedDoctor);
-    
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
+@PostMapping("/doctor")
+public ResponseEntity<Map<String, Object>> addDoctorWithImage(
+        @RequestParam("doctorName") String doctorName,
+        @RequestParam("specialization") String specialization,
+        @RequestParam("status") Boolean status,
+        @RequestParam("experience_years") int experience_years,
+        @RequestParam("earnings") Double earnings,
+        @RequestParam("memberSince") String memberSince,
+        @RequestParam("isFeature") Boolean isFeature,
+        @RequestParam("about") String about,
+        @RequestParam("certification") String certification,
+        @RequestParam("file") MultipartFile file) {
+
+    // Save the image and get its URL
+    String imageUrl = fileStorageService.storeFile(file);
+
+    // Create and set up the doctor entity
+    Doctor doctor = new Doctor();
+    doctor.setDoctorName(doctorName);
+    doctor.setSpecialization(specialization);
+    doctor.setStatus(status);
+    doctor.setEarnings(earnings);
+    doctor.setExperienceYears(experience_years);
+    doctor.setabout(about);
+    doctor.setcertification(certification);
+
+    // Convert memberSince string to LocalDateTime
+    LocalDateTime memberSinceDate = LocalDateTime.parse(memberSince);
+    doctor.setMemberSince(memberSinceDate);
+
+    doctor.setFeature(isFeature);
+    doctor.setImageURL(imageUrl);
+
+    // Call the service method to save the doctor entity
+    Doctor savedDoctor = doctorService.savedoctor(doctor);
+
+    // Create the response map
+    Map<String, Object> response = new LinkedHashMap<>();
+    response.put("status", 201);
+    response.put("message", "Doctor created successfully with image");
+    response.put("data", savedDoctor);
+
+    return new ResponseEntity<>(response, HttpStatus.CREATED);
+}
+
     
     
     
@@ -176,6 +187,15 @@ public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) 
         }
         if (updatedDetails.containsKey("imageURL")) {
             doctor.setImageURL((String) updatedDetails.get("imageURL"));
+        }
+        if (updatedDetails.containsKey("about")) {
+            doctor.setabout((String) updatedDetails.get("about"));
+        }
+        if (updatedDetails.containsKey("experience_years")) {
+            doctor.setExperienceYears((int) updatedDetails.get("experience_years"));
+        }
+        if (updatedDetails.containsKey("imageURL")) {
+            doctor.setcertification((String) updatedDetails.get("certification"));
         }
     
         // Save the updated doctor details

@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -60,12 +61,12 @@ public class PatientModel {
     // @Column(name = "apointmentslot", nullable = false)
     // private String apointmentslot;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Use LAZY fetching for better performance
-    @JoinColumn(name = "doctor_id", referencedColumnName = "id", nullable = false) // Maps to Doctor's primary key
-    @JsonBackReference
-    private Doctor doctor;
+    // @ManyToOne(fetch = FetchType.LAZY) // Use LAZY fetching for better performance
+    // @JoinColumn(name = "doctor_id", referencedColumnName = "id", nullable = false) // Maps to Doctor's primary key
+    // @JsonBackReference
+    // private Doctor doctor;
 
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Appointment> appointments;
 
     // Getter method for appointments
@@ -78,7 +79,7 @@ public class PatientModel {
     this.appointments = appointments;
   }
 
-  @OneToMany(mappedBy =  "patient")
+  @OneToMany(mappedBy =  "patient",fetch = FetchType.EAGER)
    private List<Review> reviews;
 
     public List<Review> getReviews() {
@@ -170,13 +171,13 @@ public class PatientModel {
         this.imageurl = imageurl;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
-    }
+    // public Doctor getDoctor() {
+    //     return doctor;
+    // }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
+    // public void setDoctor(Doctor doctor) {
+    //     this.doctor = doctor;
+    // }
 
 //     // Getter and Setter for 'date'
 // public String getDate() {

@@ -34,30 +34,52 @@ public class ReviewController {
         this.patientRepository = patientRepository;
     }
 
-@PostMapping("/doctors/{doctorId}/patients/{patientId}")
-public ResponseEntity<Map<String, Object>> createReview(
-        @PathVariable UUID doctorId,
-        @PathVariable UUID patientId,
-        @RequestBody Review review) {
-
-    // Fetch the doctor and patient by UUID
-    Doctor doctor = doctorRepository.findById(doctorId)
-            .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
-
-    PatientModel patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new EntityNotFoundException("Patient not found with ID: " + patientId));
-
-    // Save the review using the service method
-    Review savedReview = reviewService.saveReview(doctor, patient, review.getDescription(), review.getRating());
-
-    // Create a response map using LinkedHashMap to format the response
-    Map<String, Object> response = new LinkedHashMap<>();
-    response.put("message", "Review created successfully");
-    response.put("data", savedReview);
-
-    // Return the response with HTTP 201 status
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-}
+    @PostMapping("/doctors/{doctorId}/patients/{patientId}")
+    public ResponseEntity<Map<String, Object>> createReview(
+            @PathVariable UUID doctorId,
+            @PathVariable UUID patientId,
+            @RequestBody Review review) {
+    
+        // Fetch the doctor and patient by UUID
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
+    
+        PatientModel patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found with ID: " + patientId));
+    
+        // Save the review using the service method
+        Review savedReview = reviewService.saveReview(doctor, patient, review.getDescription(), review.getRating());
+    
+        // Create the response map
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("message", "Review created successfully");
+    
+        // Create a map for the review details
+        Map<String, Object> reviewDetails = new LinkedHashMap<>();
+        reviewDetails.put("id", savedReview.getId().toString());
+        reviewDetails.put("description", savedReview.getDescription());
+        reviewDetails.put("rating", savedReview.getRating());
+        reviewDetails.put("reviewDateTime", savedReview.getReviewDateTime());
+    
+        // Add the doctor details
+        Map<String, Object> doctorDetails = new LinkedHashMap<>();
+        doctorDetails.put("doctorId", doctor.getId().toString());
+        doctorDetails.put("doctorName", doctor.getDoctorName());
+        reviewDetails.put("doctor", doctorDetails);
+    
+        // Add the patient details
+        Map<String, Object> patientDetails = new LinkedHashMap<>();
+        patientDetails.put("patientId", patient.getId().toString());
+        patientDetails.put("patientName", patient.getPatientName());
+        reviewDetails.put("patient", patientDetails);
+    
+        // Add the review details to the response
+        response.put("data", reviewDetails);
+    
+        // Return the response with HTTP 201 status
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
 
 
     // Get review by ID

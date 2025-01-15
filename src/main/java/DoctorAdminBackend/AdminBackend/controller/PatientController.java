@@ -36,12 +36,13 @@ public class PatientController {
     @PostMapping("/create")
 		public ResponseEntity<PatientModel> savepatient(@RequestBody  PatientModel pro) throws IOException{
 			
-		   System.out.println("ID: " + pro.getId());
-		   System.out.println("Product Name: " + pro.getPatientName());
-	       System.out.println("Description: " + pro.getAddress());
-	       System.out.println("DiscountedPrice: " + pro.getAddress());
-	       System.out.println("OriginalPrice: " + pro.getPaid());
-	       System.out.println("DiscountPercentage: " + pro.getPhone());
+		   System.out.println("id: " + pro.getId());
+		   System.out.println("Patient_name: " + pro.getPatientName());
+	       System.out.println("address: " + pro.getAddress());
+	       System.out.println("age: " + pro.getAge());
+	       System.out.println("paid: " + pro.getPaid());
+	       System.out.println("phone: " + pro.getPhone());
+           System.out.println("last_visit" + pro.getLastVisit());
 	       
 	       System.out.println("-----------------------------------------------------");
 			

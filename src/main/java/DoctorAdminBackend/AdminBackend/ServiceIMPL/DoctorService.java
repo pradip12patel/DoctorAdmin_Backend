@@ -36,57 +36,7 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
     }
 
-    public List<Map<String, Object>> getDoctorsWithPatients() {
-        List<Doctor> doctors = doctorRepository.findAll(); // Fetch all doctors with their patients
     
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Doctor doctor : doctors) {
-            Map<String, Object> doctorData = new LinkedHashMap<>();
-            doctorData.put("doctorId", doctor.getId().toString());
-            doctorData.put("doctorName", doctor.getDoctorName());
-            doctorData.put("specialization", doctor.getSpecialization());
-            doctorData.put("memberSince", doctor.getMemberSince());
-            doctorData.put("earnings", doctor.getEarnings());
-            doctorData.put("status", doctor.getStatus());
-            doctorData.put("experience_years", doctor.getExperienceYears());
-            doctorData.put("ImageUrl", doctor.getImageURL());
-            doctorData.put("isFeature", doctor.isFeature());
-    
-            // Map patients associated with the doctor
-            List<Map<String, Object>> patients = new ArrayList<>();
-            for (PatientModel patient : doctor.getPatients()) {
-                Map<String, Object> patientData = new LinkedHashMap<>();
-                patientData.put("patientId", patient.getId().toString());
-                patientData.put("patientName", patient.getPatientName());
-                patientData.put("age", patient.getAge());
-                patientData.put("address", patient.getAddress());
-                patientData.put("phone", patient.getPhone());
-                patientData.put("lastVisit", patient.getLastVisit());
-                patientData.put("paid", patient.getPaid());
-                patientData.put("ImageUrl", patient.getImageURL());
-    
-                // Map associated appointments for each patient
-                List<Map<String, Object>> appointments = new ArrayList<>();
-                for (Appointment appointment : patient.getAppointments()) {
-                    Map<String, Object> appointmentData = new LinkedHashMap<>();
-                    appointmentData.put("appointmentId", appointment.getId().toString());
-                appointmentData.put("AppointmentSlot", appointment.getFormattedAppointmentDate());
-                    appointments.add(appointmentData);
-                }
-    
-                // Add appointments to patient data
-                patientData.put("appointments", appointments);
-                patients.add(patientData);
-            }
-    
-            // Add patients to doctor data
-            doctorData.put("patients", patients);
-    
-            result.add(doctorData); // Add doctor to result
-        }
-    
-        return result;
-    }
     
     public Doctor updateStatus(UUID doctorId, boolean status) {
         // Find the doctor by their ID
@@ -117,14 +67,18 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
 
     private double calculateTotalEarnings(Doctor doctor) {
         double totalEarnings = 0.0;
-
-        // Iterate through the doctor's patients and sum their paid amounts
-        for (PatientModel patient : doctor.getPatients()) {
-            totalEarnings += patient.getPaid();
+    
+        // Iterate through the doctor's appointments and sum the paid amounts from associated patients
+        for (Appointment appointment : doctor.getAppointments()) {
+            PatientModel patient = appointment.getPatient();
+            if (patient != null) { // Ensure patient is not null
+                totalEarnings += patient.getPaid();
+            }
         }
-
+    
         return totalEarnings;
     }
+    
 
     public Doctor updateIsFeature(UUID doctorId, boolean isFeature) {
         Doctor doctor = doctorRepository.findById(doctorId)

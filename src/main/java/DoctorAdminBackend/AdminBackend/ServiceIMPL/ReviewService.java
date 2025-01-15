@@ -33,7 +33,7 @@ public class ReviewService {
     }
 
   // Save review with Doctor and Patient objects
-  public Review saveReview(Doctor doctor, PatientModel patient, String description, int rating) {
+  public Review saveReview(Doctor doctor, PatientModel patient, String description, double rating) {
 
     // Create a new Review and set the details
     Review review = new Review();
