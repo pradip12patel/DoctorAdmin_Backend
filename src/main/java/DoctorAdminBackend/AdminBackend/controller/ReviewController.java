@@ -20,6 +20,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/reviews")
+@CrossOrigin(origins = "http://localhost:8084")
 public class ReviewController {
 
     private final ReviewService reviewService;

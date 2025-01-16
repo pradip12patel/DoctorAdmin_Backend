@@ -51,8 +51,8 @@ public class PatientModel {
     @Column(name = "paid", nullable = false)
     private double paid;
 
-    @Column(name = "imageurl", nullable = false)
-    private String imageurl;
+    @Column(name = "imageurl")
+    private String imageurl = "/uploads/bydefault.jpg";
 
     // private String date;       // Format: "5 Nov 2019"
     // private String startTime;  // Format: "11:00 AM"

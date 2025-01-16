@@ -9,11 +9,10 @@ public interface PatientService {
 
     PatientModel savePatient(PatientModel Patient);
 	  
-	  List<PatientModel> savesPatient(PatientModel[] newPatient);
+	    List<PatientModel> savesPatient(PatientModel[] newPatient);
 		
-      List<PatientModel> getAllPatients();
+        List<PatientModel> getAllPatients();
 
-		
 		PatientModel getPatientbyID(UUID id);
 		
 		PatientModel updatePatient(PatientModel pro, UUID id);

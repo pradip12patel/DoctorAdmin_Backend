@@ -14,7 +14,7 @@ import java.util.UUID;
 public class FileStorageService {
 
 
-    private final String uploadDir = "/uploads/"; // Specify your upload directory, relative to the project root
+    private final String uploadDir = "/uploads/"; 
 
     public FileStorageService() {
         // Ensure the upload directory exists

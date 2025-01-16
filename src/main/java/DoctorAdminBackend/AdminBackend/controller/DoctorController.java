@@ -65,7 +65,7 @@ public class DoctorController {
         this.doctorDetailData= doctorDetailData;
     }
 
-    // 1. GET - Retrieve all doctors with patients
+    
     @GetMapping("/doctor-with-patients")
     public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
         List<Map<String, Object>> doctorsWithPatients = doctorDetailData.getDoctorsWithPatients();
@@ -79,8 +79,8 @@ public class DoctorController {
     }
 
     @GetMapping("/doctor/{id}")
-public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) {
-    // Log a message to indicate the method is being called
+    public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) {
+    
     System.out.println("Fetching doctor details for ID: " + id);
 
     Map<String, Object> response = new LinkedHashMap<>();
@@ -96,12 +96,11 @@ public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) 
 
         return ResponseEntity.ok(response);
     } catch (RuntimeException ex) {
-        System.out.println("Error: " + ex.getMessage()); // Log the error message
+        System.out.println("Error: " + ex.getMessage()); 
 
-        // Add error message to the response
         response.put("message", "Doctor not found with ID: " + id);
 
-        return ResponseEntity.status(404).body(response); // Return 404 with the message
+        return ResponseEntity.status(404).body(response); 
     }
 }
 
@@ -149,59 +148,18 @@ public ResponseEntity<Map<String, Object>> addDoctorWithImage(
     return new ResponseEntity<>(response, HttpStatus.CREATED);
 }
 
-    
-    
-    
-   
-
-
-    @PutMapping("/doctor/{doctorId}")
+   @PutMapping("/doctor/{doctorId}")
     public ResponseEntity<Doctor> updateDoctorDetails(
-            @PathVariable UUID doctorId, 
+            @PathVariable UUID doctorId,
             @RequestBody Map<String, Object> updatedDetails) {
-    
-        // Fetch the doctor by ID
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
-    
-        // Update doctor details if present in the request body
-        if (updatedDetails.containsKey("doctorName")) {
-            doctor.setDoctorName((String) updatedDetails.get("doctorName"));
-        }
-        if (updatedDetails.containsKey("specialization")) {
-            doctor.setSpecialization((String) updatedDetails.get("specialization"));
-        }
-        if (updatedDetails.containsKey("status")) {
-            doctor.setStatus((Boolean) updatedDetails.get("status"));
-        }
-        if (updatedDetails.containsKey("earnings")) {
-            doctor.setEarnings(((Number) updatedDetails.get("earnings")).doubleValue());
-        }
-        if (updatedDetails.containsKey("isFeature")) {
-            doctor.setFeature((Boolean) updatedDetails.get("isFeature"));
-        }
-        if (updatedDetails.containsKey("memberSince")) {
-            doctor.setMemberSince((LocalDateTime) updatedDetails.get("memberSince"));
-        }
-        if (updatedDetails.containsKey("imageURL")) {
-            doctor.setImageURL((String) updatedDetails.get("imageURL"));
-        }
-        if (updatedDetails.containsKey("about")) {
-            doctor.setabout((String) updatedDetails.get("about"));
-        }
-        if (updatedDetails.containsKey("experience_years")) {
-            doctor.setExperienceYears((int) updatedDetails.get("experience_years"));
-        }
-        if (updatedDetails.containsKey("imageURL")) {
-            doctor.setcertification((String) updatedDetails.get("certification"));
-        }
-    
-        // Save the updated doctor details
-        doctorRepository.save(doctor);
-    
+        
+        // Delegate the update operation to the service
+        Doctor updatedDoctor = doctorService.updateDoctorDetails(doctorId, updatedDetails);
+        
         // Return the updated doctor details
-        return ResponseEntity.ok(doctor);
+        return ResponseEntity.ok(updatedDoctor);
     }
+
     
     // 7. POST - Book an appointment (set appointment slot for a patient)
     @PostMapping("/set-appointment")

@@ -42,7 +42,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
         "FROM doctors d " +
         "LEFT JOIN appointments a ON d.id = a.doctor_id " +
         "LEFT JOIN patients p ON a.patient_id = p.id " +
-        "LEFT JOIN reviews r ON r.doctor_id = d.id AND r.patient_id = p.id", 
+        "LEFT JOIN reviews r ON r.doctor_id = d.id AND r.patient_id = p.id",
         nativeQuery = true)
 
    List<Object[]> findAllDoctorsWithPatients();
