@@ -1,9 +1,9 @@
-package DoctorAdminBackend.AdminBackend.Epection;
+package DoctorAdminBackend.AdminBackend.Exepection;
 
-public class PatientEception extends RuntimeException {
+public class PatientExeption extends RuntimeException {
 
 
-    public PatientEception(String message) {
+    public PatientExeption(String message) {
         super(message);
     }
 
