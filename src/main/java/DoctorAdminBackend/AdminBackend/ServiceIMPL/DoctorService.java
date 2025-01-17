@@ -71,6 +71,10 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
         // Save the updated doctor details
         return doctorRepository.save(doctor);
     }
+
+
+
+    
     
     public Doctor updateStatus(UUID doctorId, boolean status) {
         // Find the doctor by their ID
