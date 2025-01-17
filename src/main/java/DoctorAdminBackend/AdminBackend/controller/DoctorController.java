@@ -168,36 +168,36 @@ public ResponseEntity<Map<String, Object>> addDoctorWithImage(
         return ResponseEntity.ok(updatedPatient);
     }
 
-    // // 8. POST - Upload image for doctor or patient
-    // @PostMapping("/upload-image/{type}/{id}")
-    // public ResponseEntity<Map<String, Object>> uploadImage(
-    //         @PathVariable String type, 
-    //         @PathVariable UUID id, 
-    //         @RequestParam("file") MultipartFile file) {
+    // 8. POST - Upload image for doctor or patient
+    @PostMapping("/upload-image/{type}/{id}")
+    public ResponseEntity<Map<String, Object>> uploadImage(
+            @PathVariable String type, 
+            @PathVariable UUID id, 
+            @RequestParam("file") MultipartFile file) {
 
-    //     String imageUrl = fileStorageService.storeFile(file);
+        String imageUrl = fileStorageService.storeFile(file);
 
-    //     if ("doctor".equalsIgnoreCase(type)) {
-    //         Doctor doctor = doctorRepository.findById(id)
-    //                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
-    //         doctor.setImageURL(imageUrl);
-    //         doctorRepository.save(doctor);
-    //     } else if ("patient".equalsIgnoreCase(type)) {
-    //         PatientModel patient = patientRepository.findById(id)
-    //                 .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
-    //         patient.setImageURL(imageUrl);
-    //         patientRepository.save(patient);
-    //     } else {
-    //         throw new IllegalArgumentException("Invalid type specified. Must be either 'doctor' or 'patient'.");
-    //     }
+        if ("doctor".equalsIgnoreCase(type)) {
+            Doctor doctor = doctorRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
+            doctor.setImageURL(imageUrl);
+            doctorRepository.save(doctor);
+        } else if ("patient".equalsIgnoreCase(type)) {
+            PatientModel patient = patientRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+            patient.setImageURL(imageUrl);
+            patientRepository.save(patient);
+        } else {
+            throw new IllegalArgumentException("Invalid type specified. Must be either 'doctor' or 'patient'.");
+        }
 
-    //     Map<String, Object> response = new LinkedHashMap<>();
-    //     response.put("status", 200);
-    //     response.put("message", "Image uploaded successfully");
-    //     response.put("imageUrl", imageUrl);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("message", "Image uploaded successfully");
+        response.put("imageUrl", imageUrl);
 
-    //     return ResponseEntity.ok(response);
-    // }
+        return ResponseEntity.ok(response);
+    }
 
     // 9. DELETE - Remove a doctor
     @DeleteMapping("/doctor/{doctorId}")
