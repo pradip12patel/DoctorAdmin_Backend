@@ -30,6 +30,12 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
         return doctorRepository.save(doctor);
     }
 
+    @Override
+    public Doctor getDoctorbyId(UUID id)  {
+
+       return doctorRepository.findById(id)
+       .orElseThrow(() -> new RuntimeException("Doctor not found with ID" + id));
+    }
 
      public Doctor updateDoctorDetails(UUID doctorId, Map<String, Object> updatedDetails) {
         // Fetch the doctor by ID or throw an exception if not found
@@ -74,7 +80,7 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
 
 
 
-    
+
     
     public Doctor updateStatus(UUID doctorId, boolean status) {
         // Find the doctor by their ID
