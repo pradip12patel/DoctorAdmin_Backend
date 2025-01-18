@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Data
@@ -27,6 +28,12 @@ public class Doctor {
     @Column(name = "specialization")
     private String specialization;
 
+    @Column(name = "certification")
+    private String certification;
+
+    @Column(name = "about")
+    private String about;
+
     @Column(name = "member_since")
     private LocalDateTime memberSince;
 
@@ -39,9 +46,9 @@ public class Doctor {
     @Column(name = "imageurl")
     private String imageurl;
 
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
-    private List<PatientModel> patients;
+    // @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    // @JsonManagedReference
+    // private List<PatientModel> patients;
 
     @Column(name = "experience_years", nullable = false)
     private int experienceYears;
@@ -54,7 +61,8 @@ public class Doctor {
         this.experienceYears = experienceYears;
     }
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Appointment> appointments;
 
     // Getter method for appointments
@@ -67,7 +75,7 @@ public class Doctor {
     this.appointments = appointments;
   }
 
-  @OneToMany(mappedBy =  "doctor")
+  @OneToMany(mappedBy =  "doctor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
    private List<Review> reviews;
 
     public List<Review> getReviews() {
@@ -148,12 +156,30 @@ public class Doctor {
         this.imageurl = imageurl;
     }
 
-    public List<PatientModel> getPatients() {
-        return patients;
+    // public List<PatientModel> getPatients() {
+    //     return patients;
+    // }
+
+    // public void setPatients(List<PatientModel> patients) {
+    //     this.patients = patients;
+    // }
+
+    public String getcertification()  {
+
+        return certification;
     }
 
-    public void setPatients(List<PatientModel> patients) {
-        this.patients = patients;
+    public void setcertification(String certification)  {
+        this.certification = certification;
     }
+
+    public String getabout()  {
+        return about;
+    }
+
+    public void setabout(String about)  {
+        this.about = about;
+    }
+
 }
 

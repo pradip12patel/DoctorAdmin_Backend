@@ -21,6 +21,7 @@ import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 
 @RestController
 @RequestMapping("/appointments")
+@CrossOrigin(origins = "http://localhost:8084")
 public class AppointmentController {
 
     @Autowired

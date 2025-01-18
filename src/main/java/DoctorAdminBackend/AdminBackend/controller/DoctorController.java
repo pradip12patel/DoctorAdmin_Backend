@@ -30,6 +30,7 @@ import DoctorAdminBackend.AdminBackend.Model.Doctor;
 import DoctorAdminBackend.AdminBackend.Model.PatientModel;
 import DoctorAdminBackend.AdminBackend.Reposotiry.DoctorRepository;
 import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
+import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorDetailData;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.FileStorageService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.PatientServiceIMPL;
@@ -45,6 +46,7 @@ public class DoctorController {
     private final FileStorageService fileStorageService;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final DoctorDetailData doctorDetailData;
 
     @Autowired
     public DoctorController(
@@ -52,19 +54,21 @@ public class DoctorController {
         PatientServiceIMPL patientService,
         FileStorageService fileStorageService, 
         DoctorRepository doctorRepository, 
-        PatientRepository patientRepository
+        PatientRepository patientRepository,
+        DoctorDetailData doctorDetailData
     ) {
         this.doctorService = doctorService;
         this.patientService = patientService;
         this.fileStorageService = fileStorageService;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
+        this.doctorDetailData= doctorDetailData;
     }
 
-    // 1. GET - Retrieve all doctors with patients
+    
     @GetMapping("/doctor-with-patients")
     public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
-        List<Map<String, Object>> doctorsWithPatients = doctorService.getDoctorsWithPatients();
+        List<Map<String, Object>> doctorsWithPatients = doctorDetailData.getDoctorsWithPatients();
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -75,8 +79,8 @@ public class DoctorController {
     }
 
     @GetMapping("/doctor/{id}")
-public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) {
-    // Log a message to indicate the method is being called
+    public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) {
+    
     System.out.println("Fetching doctor details for ID: " + id);
 
     Map<String, Object> response = new LinkedHashMap<>();
@@ -92,98 +96,70 @@ public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) 
 
         return ResponseEntity.ok(response);
     } catch (RuntimeException ex) {
-        System.out.println("Error: " + ex.getMessage()); // Log the error message
+        System.out.println("Error: " + ex.getMessage()); 
 
-        // Add error message to the response
         response.put("message", "Doctor not found with ID: " + id);
 
-        return ResponseEntity.status(404).body(response); // Return 404 with the message
+        return ResponseEntity.status(404).body(response); 
     }
 }
 
 
-    @PostMapping("/doctor")
-    public ResponseEntity<Map<String, Object>> addDoctorWithImage(
-            @RequestParam("doctorName") String doctorName,
-            @RequestParam("specialization") String specialization,
-            @RequestParam("status") Boolean status,
-            @RequestParam("earnings") Double earnings,
-            @RequestParam("memberSince") String memberSince,
-            @RequestParam("isFeature") Boolean isFeature,
-            @RequestParam("file") MultipartFile file) {
-    
-        // Save the image and get its URL
-        String imageUrl = fileStorageService.storeFile(file);
-    
-        // Create and set up the doctor entity
-        Doctor doctor = new Doctor();
-        doctor.setDoctorName(doctorName);
-        doctor.setSpecialization(specialization);
-        doctor.setStatus(status);
-        doctor.setEarnings(earnings);
-    
-        // Convert memberSince string to LocalDateTime
-        LocalDateTime memberSinceDate = LocalDateTime.parse(memberSince);
-        doctor.setMemberSince(memberSinceDate);
-    
-        doctor.setFeature(isFeature);
-        doctor.setImageURL(imageUrl);
-    
-        // Call the service method to save the doctor entity
-        Doctor savedDoctor = doctorService.savedoctor(doctor);
-    
-        // Create the response map
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", 201);
-        response.put("message", "Doctor created successfully with image");
-        response.put("data", savedDoctor);
-    
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-    
-    
-    
-   
+@PostMapping("/doctor")
+public ResponseEntity<Map<String, Object>> addDoctorWithImage(
+        @RequestParam("doctorName") String doctorName,
+        @RequestParam("specialization") String specialization,
+        @RequestParam("status") Boolean status,
+        @RequestParam("experience_years") int experience_years,
+        @RequestParam("earnings") Double earnings,
+        @RequestParam("memberSince") String memberSince,
+        @RequestParam("isFeature") Boolean isFeature,
+        @RequestParam("about") String about,
+        @RequestParam("certification") String certification,
+        @RequestParam("file") MultipartFile file) {
 
+    // Save the image and get its URL
+    String imageUrl = fileStorageService.storeFile(file);
 
-    @PutMapping("/doctor/{doctorId}")
+    // Create and set up the doctor entity
+    Doctor doctor = new Doctor();
+    doctor.setDoctorName(doctorName);
+    doctor.setSpecialization(specialization);
+    doctor.setStatus(status);
+    doctor.setEarnings(earnings);
+    doctor.setExperienceYears(experience_years);
+    doctor.setabout(about);
+    doctor.setcertification(certification);
+    // Convert memberSince string to LocalDateTime
+    LocalDateTime memberSinceDate = LocalDateTime.parse(memberSince);
+    doctor.setMemberSince(memberSinceDate);
+    doctor.setFeature(isFeature);
+    doctor.setImageURL(imageUrl);
+
+    // Call the service method to save the doctor entity
+    Doctor savedDoctor = doctorService.savedoctor(doctor);
+
+    // Create the response map
+    Map<String, Object> response = new LinkedHashMap<>();
+    response.put("status", 201);
+    response.put("message", "Doctor created successfully with image");
+    response.put("data", savedDoctor);
+
+    return new ResponseEntity<>(response, HttpStatus.CREATED);
+}
+
+   @PutMapping("/doctor/{doctorId}")
     public ResponseEntity<Doctor> updateDoctorDetails(
-            @PathVariable UUID doctorId, 
+            @PathVariable UUID doctorId,
             @RequestBody Map<String, Object> updatedDetails) {
-    
-        // Fetch the doctor by ID
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
-    
-        // Update doctor details if present in the request body
-        if (updatedDetails.containsKey("doctorName")) {
-            doctor.setDoctorName((String) updatedDetails.get("doctorName"));
-        }
-        if (updatedDetails.containsKey("specialization")) {
-            doctor.setSpecialization((String) updatedDetails.get("specialization"));
-        }
-        if (updatedDetails.containsKey("status")) {
-            doctor.setStatus((Boolean) updatedDetails.get("status"));
-        }
-        if (updatedDetails.containsKey("earnings")) {
-            doctor.setEarnings(((Number) updatedDetails.get("earnings")).doubleValue());
-        }
-        if (updatedDetails.containsKey("isFeature")) {
-            doctor.setFeature((Boolean) updatedDetails.get("isFeature"));
-        }
-        if (updatedDetails.containsKey("memberSince")) {
-            doctor.setMemberSince((LocalDateTime) updatedDetails.get("memberSince"));
-        }
-        if (updatedDetails.containsKey("imageURL")) {
-            doctor.setImageURL((String) updatedDetails.get("imageURL"));
-        }
-    
-        // Save the updated doctor details
-        doctorRepository.save(doctor);
-    
+        
+        // Delegate the update operation to the service
+        Doctor updatedDoctor = doctorService.updateDoctorDetails(doctorId, updatedDetails);
+        
         // Return the updated doctor details
-        return ResponseEntity.ok(doctor);
+        return ResponseEntity.ok(updatedDoctor);
     }
+
     
     // 7. POST - Book an appointment (set appointment slot for a patient)
     @PostMapping("/set-appointment")
@@ -192,36 +168,36 @@ public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) 
         return ResponseEntity.ok(updatedPatient);
     }
 
-    // // 8. POST - Upload image for doctor or patient
-    // @PostMapping("/upload-image/{type}/{id}")
-    // public ResponseEntity<Map<String, Object>> uploadImage(
-    //         @PathVariable String type, 
-    //         @PathVariable UUID id, 
-    //         @RequestParam("file") MultipartFile file) {
+    // 8. POST - Upload image for doctor or patient
+    @PostMapping("/upload-image/{type}/{id}")
+    public ResponseEntity<Map<String, Object>> uploadImage(
+            @PathVariable String type, 
+            @PathVariable UUID id, 
+            @RequestParam("file") MultipartFile file) {
 
-    //     String imageUrl = fileStorageService.storeFile(file);
+        String imageUrl = fileStorageService.storeFile(file);
 
-    //     if ("doctor".equalsIgnoreCase(type)) {
-    //         Doctor doctor = doctorRepository.findById(id)
-    //                 .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
-    //         doctor.setImageURL(imageUrl);
-    //         doctorRepository.save(doctor);
-    //     } else if ("patient".equalsIgnoreCase(type)) {
-    //         PatientModel patient = patientRepository.findById(id)
-    //                 .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
-    //         patient.setImageURL(imageUrl);
-    //         patientRepository.save(patient);
-    //     } else {
-    //         throw new IllegalArgumentException("Invalid type specified. Must be either 'doctor' or 'patient'.");
-    //     }
+        if ("doctor".equalsIgnoreCase(type)) {
+            Doctor doctor = doctorRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
+            doctor.setImageURL(imageUrl);
+            doctorRepository.save(doctor);
+        } else if ("patient".equalsIgnoreCase(type)) {
+            PatientModel patient = patientRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+            patient.setImageURL(imageUrl);
+            patientRepository.save(patient);
+        } else {
+            throw new IllegalArgumentException("Invalid type specified. Must be either 'doctor' or 'patient'.");
+        }
 
-    //     Map<String, Object> response = new LinkedHashMap<>();
-    //     response.put("status", 200);
-    //     response.put("message", "Image uploaded successfully");
-    //     response.put("imageUrl", imageUrl);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("message", "Image uploaded successfully");
+        response.put("imageUrl", imageUrl);
 
-    //     return ResponseEntity.ok(response);
-    // }
+        return ResponseEntity.ok(response);
+    }
 
     // 9. DELETE - Remove a doctor
     @DeleteMapping("/doctor/{doctorId}")

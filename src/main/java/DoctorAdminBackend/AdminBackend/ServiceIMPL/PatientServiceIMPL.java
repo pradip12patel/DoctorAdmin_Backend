@@ -62,7 +62,7 @@ public class PatientServiceIMPL implements PatientService{
     }
 
     @Override
-public PatientModel getPatientbyID(UUID id) {
+    public PatientModel getPatientbyID(UUID id) {
     // Use Optional's orElseThrow to simplify null check
     Optional<PatientModel> patientOpt = patientRepository.findById(id);
     return patientOpt.orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
@@ -79,7 +79,7 @@ public PatientModel getPatientbyID(UUID id) {
         existingPatient.setPhone(patient.getPhone());
         existingPatient.setLastVisit(patient.getLastVisit());
         existingPatient.setPaid(patient.getPaid());
-     //   existingPatient.setApointmentSlot(patient.getApointmentSlot()); // Ensure this field is set
+     //   existingPatient.setApointmentSlot(patient.getApointmentSlot()); 
         existingPatient.setImageURL(patient.getImageURL());  
 
 
