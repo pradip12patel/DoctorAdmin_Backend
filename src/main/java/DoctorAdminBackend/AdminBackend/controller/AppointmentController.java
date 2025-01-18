@@ -32,13 +32,7 @@ public class AppointmentController {
 
     @Autowired
     private DoctorRepository doctorRepository;
-
-    /**
-     * Books an appointment.
-     *
-     * @param request The appointment details in the request body.
-     * @return ResponseEntity containing the appointment booking status and details.
-     */
+   
     @PostMapping("/book")
     public ResponseEntity<Object> bookAppointment(@RequestBody Appointment request) {
 
