@@ -36,17 +36,22 @@ public class FileStorageService {
             fileName = fileName.substring(1); 
         }
 
+        String uniqueFileName = fileName;
+
         try {
-            Path filePath = Paths.get(uploadDir).resolve(fileName);
+            Path filePath = Paths.get(uploadDir).resolve(uniqueFileName);
+    
+            // Copy file, replace if it already exists
             Files.copy(file.getInputStream(), filePath);
 
             String imageUrl = filePath.toString().replace("\\", "/"); 
-
-            return "http://localhost:8086"+imageUrl; 
+    
+            // Return a URL-friendly path
+            return "http://localhost:8086" + imageUrl;
         } catch (IOException e) {
-
-            throw new RuntimeException("Failed to store file " + fileName, e);
+            throw new RuntimeException("Failed to store file " + uniqueFileName, e);
         }
     }
+
 }
 

@@ -11,13 +11,15 @@ import DoctorAdminBackend.AdminBackend.Model.Doctor;
 
 
 @Repository
-public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
+public interface DoctorRepository extends JpaRepository<Doctor,UUID> {
 
    @Query(value = "SELECT " +
         "d.id AS doctorId, " +
+        "d.email_id AS email, " +
         "d.doctor_name AS doctorName, " +
         "d.specialization AS specialization, " +
         "d.member_since AS memberSince, " +
+        "d.address AS address, " +
         "d.earnings AS earnings, " +
         "d.status AS doctorStatus, " +
         "d.about AS About, " +

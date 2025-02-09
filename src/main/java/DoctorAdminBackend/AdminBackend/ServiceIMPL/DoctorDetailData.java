@@ -36,7 +36,9 @@ public class DoctorDetailData {
             doctorData.put("specialization", doctor.getSpecialization());
             doctorData.put("memberSince", doctor.getMemberSince());
             doctorData.put("earnings", doctor.getEarnings());
+            doctorData.put("address", doctor.getAddress());
             doctorData.put("status", doctor.getStatus());
+            doctorData.put("email", doctor.getEmail());
             doctorData.put("certification", doctor.getcertification());
             doctorData.put("about", doctor.getabout());
             doctorData.put("experience_years", doctor.getExperienceYears());

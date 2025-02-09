@@ -1,28 +1,32 @@
 package DoctorAdminBackend.AdminBackend.controller;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
+import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
@@ -104,42 +108,46 @@ public class DoctorController {
     }
 }
 
-
-@PostMapping("/doctor")
-public ResponseEntity<Map<String, Object>> addDoctorWithImage(
+   @PostMapping(value = "/doctor")
+   public ResponseEntity<Map<String, Object>> addDoctorWithImage(
+        @RequestParam("file") MultipartFile file,
         @RequestParam("doctorName") String doctorName,
         @RequestParam("specialization") String specialization,
         @RequestParam("status") Boolean status,
-        @RequestParam("experience_years") int experience_years,
+        @RequestParam("experience_years") int experienceYears,
         @RequestParam("earnings") Double earnings,
         @RequestParam("memberSince") String memberSince,
         @RequestParam("isFeature") Boolean isFeature,
         @RequestParam("about") String about,
         @RequestParam("certification") String certification,
-        @RequestParam("file") MultipartFile file) {
+        @RequestParam("email") String email,
+        @RequestParam("address") String addressjson) {
 
-    // Save the image and get its URL
-    String imageUrl = fileStorageService.storeFile(file);
 
-    // Create and set up the doctor entity
+    // Create Doctor entity
     Doctor doctor = new Doctor();
     doctor.setDoctorName(doctorName);
     doctor.setSpecialization(specialization);
     doctor.setStatus(status);
+    doctor.setEmail(email);
     doctor.setEarnings(earnings);
-    doctor.setExperienceYears(experience_years);
+    doctor.setExperienceYears(experienceYears);
     doctor.setabout(about);
     doctor.setcertification(certification);
-    // Convert memberSince string to LocalDateTime
-    LocalDateTime memberSinceDate = LocalDateTime.parse(memberSince);
-    doctor.setMemberSince(memberSinceDate);
+    doctor.setImageURL(fileStorageService.storeFile(file));
     doctor.setFeature(isFeature);
-    doctor.setImageURL(imageUrl);
+    doctor.setAddress(addressjson);
 
-    // Call the service method to save the doctor entity
+    try {
+        doctor.setMemberSince(LocalDateTime.parse(memberSince));
+    } catch (DateTimeParseException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "Invalid date format for memberSince. Use 'yyyy-MM-ddTHH:mm:ss' format."));
+    }
+
+    // Save the doctor entity
     Doctor savedDoctor = doctorService.savedoctor(doctor);
 
-    // Create the response map
     Map<String, Object> response = new LinkedHashMap<>();
     response.put("status", 201);
     response.put("message", "Doctor created successfully with image");
@@ -148,17 +156,6 @@ public ResponseEntity<Map<String, Object>> addDoctorWithImage(
     return new ResponseEntity<>(response, HttpStatus.CREATED);
 }
 
-   @PutMapping("/doctor/{doctorId}")
-    public ResponseEntity<Doctor> updateDoctorDetails(
-            @PathVariable UUID doctorId,
-            @RequestBody Map<String, Object> updatedDetails) {
-        
-        // Delegate the update operation to the service
-        Doctor updatedDoctor = doctorService.updateDoctorDetails(doctorId, updatedDetails);
-        
-        // Return the updated doctor details
-        return ResponseEntity.ok(updatedDoctor);
-    }
 
     
     // 7. POST - Book an appointment (set appointment slot for a patient)

@@ -10,6 +10,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import DoctorAdminBackend.AdminBackend.Model.Appointment;
 import DoctorAdminBackend.AdminBackend.Model.Doctor;
 import DoctorAdminBackend.AdminBackend.Model.PatientModel;
@@ -20,14 +23,39 @@ import jakarta.persistence.EntityNotFoundException;
 public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final ObjectMapper objectmapper;
 
-    public DoctorService(DoctorRepository doctorRepository) {
+    public DoctorService(DoctorRepository doctorRepository, ObjectMapper objectmapper) {
         this.doctorRepository = doctorRepository;
+        this.objectmapper = objectmapper;
     }
 
     @Override
     public Doctor savedoctor(Doctor doctor) {
         return doctorRepository.save(doctor);
+    }
+
+     public String saveAddress(UUID doctorId, String addressJson) {
+        Optional<Doctor> doctorOptional = doctorRepository.findById(doctorId);
+
+        if (doctorOptional.isEmpty()) {
+            throw new EntityNotFoundException("Doctor not found with ID: " + doctorId);
+        }
+
+        Doctor doctor = doctorOptional.get();
+
+        try {
+            // Convert String to JsonNode
+            JsonNode addressNode = objectmapper.readTree(addressJson);
+            String normalizedAddressJson = objectmapper.writeValueAsString(addressNode);
+            
+            doctor.setAddress(normalizedAddressJson);
+            doctorRepository.save(doctor);
+
+            return "Address saved successfully";
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid JSON format for address", e);
+        }
     }
 
     @Override
@@ -72,6 +100,9 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
         }
         if (updatedDetails.containsKey("certification")) {
             doctor.setcertification((String) updatedDetails.get("certification"));
+        }
+        if (updatedDetails.containsKey("email")) {
+            doctor.setEmail((String) updatedDetails.get("email"));
         }
 
         // Save the updated doctor details
