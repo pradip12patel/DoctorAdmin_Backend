@@ -104,6 +104,9 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
         if (updatedDetails.containsKey("email")) {
             doctor.setEmail((String) updatedDetails.get("email"));
         }
+        if (updatedDetails.containsKey("address"))   {
+            doctor.setAddress((String) updatedDetails.get("address"));
+        }
 
         // Save the updated doctor details
         return doctorRepository.save(doctor);
