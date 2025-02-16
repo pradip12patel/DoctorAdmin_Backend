@@ -50,7 +50,7 @@ public class Doctor {
 
     @Column(name = "status")
     private boolean status;
-    
+
     @Column(name = "imageurl")
     private String imageurl;
 
@@ -66,18 +66,19 @@ public class Doctor {
         return email;
     }
 
-    public void setEmail(String email)  {
+    public void setEmail(String email) {
 
         this.email = email;
     }
-    // @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    // @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch =
+    // FetchType.EAGER)
     // @JsonManagedReference
     // private List<PatientModel> patients;
 
     @Column(name = "experience_years", nullable = false)
     private int experienceYears;
 
-   public int getExperienceYears() {
+    public int getExperienceYears() {
         return experienceYears;
     }
 
@@ -91,25 +92,24 @@ public class Doctor {
 
     // Getter method for appointments
     public List<Appointment> getAppointments() {
-    return appointments;
-   }
+        return appointments;
+    }
 
-// Setter method for appointments
-   public void setAppointments(List<Appointment> appointments) {
-    this.appointments = appointments;
-  }
+    // Setter method for appointments
+    public void setAppointments(List<Appointment> appointments) {
+        this.appointments = appointments;
+    }
 
-  @OneToMany(mappedBy =  "doctor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-   private List<Review> reviews;
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Review> reviews;
 
     public List<Review> getReviews() {
         return reviews;
-       }
-    
-       public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
-      }
+    }
 
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
 
     @Column(name = "is_feature", nullable = false)
     private boolean isFeature;
@@ -122,14 +122,14 @@ public class Doctor {
         this.isFeature = isFeature;
     }
 
-   // Getter for id
-   public UUID getId() {
-    return id;
-     }
+    // Getter for id
+    public UUID getId() {
+        return id;
+    }
 
-// Setter for id
+    // Setter for id
     public void setId(UUID id) {
-    this.id = id;
+        this.id = id;
     }
 
     public String getDoctorName() {
@@ -173,7 +173,7 @@ public class Doctor {
     }
 
     public String getImageURL() {
-        return  imageurl;
+        return imageurl;
     }
 
     public void setImageURL(String imageurl) {
@@ -181,34 +181,29 @@ public class Doctor {
     }
 
     // public List<PatientModel> getPatients() {
-    //     return patients;
+    // return patients;
     // }
 
     // public void setPatients(List<PatientModel> patients) {
-    //     this.patients = patients;
+    // this.patients = patients;
     // }
 
-    public String getcertification()  {
+    public String getcertification() {
 
         return certification;
-        
+
     }
 
-    public void setcertification(String certification)  {
+    public void setcertification(String certification) {
         this.certification = certification;
     }
 
-    public String getabout()  {
+    public String getabout() {
         return about;
     }
 
-    public void setabout(String about)  {
+    public void setabout(String about) {
         this.about = about;
     }
 
-
-
-
-
 }
-

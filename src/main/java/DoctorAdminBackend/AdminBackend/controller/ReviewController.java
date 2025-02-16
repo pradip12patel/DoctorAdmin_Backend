@@ -1,9 +1,11 @@
 package DoctorAdminBackend.AdminBackend.controller;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -81,7 +83,32 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
-
+    @GetMapping("/allreviews")
+    public ResponseEntity<Map<String, Object>> getAllReviews() {
+        List<Review> reviews = reviewService.getAllReviews();
+    
+        List<Map<String, Object>> reviewList = reviews.stream().map(review -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", review.getId());
+            map.put("rating", review.getRating());
+            map.put("description", review.getDescription());
+            map.put("date&time", review.getReviewDateTime());
+            map.put("doctorimg", review.getDoctor().getImageURL());
+            map.put("doctor", review.getDoctor() != null ? review.getDoctor().getDoctorName() : "Unknown");
+            map.put("patient", review.getPatient() != null ? review.getPatient().getPatientName() : "Unknown");
+            map.put("patientimg", review.getPatient().getImageURL());
+            return map;
+        }).collect(Collectors.toList());
+    
+        // Construct response
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("message", "Reviews fetched successfully");
+        response.put("data", reviewList);
+    
+        return ResponseEntity.ok(response);
+    }
+    
 
     // Get review by ID
     @GetMapping("/{id}")
