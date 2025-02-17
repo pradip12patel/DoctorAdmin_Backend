@@ -31,6 +31,7 @@ public class AppointmentService {
     public Appointment bookAppointment(
             PatientModel patient, 
             Doctor doctor, 
+            Double paid,
             LocalDateTime appointmentDate, 
             LocalDateTime appointmentEndTime) {
         
@@ -53,6 +54,7 @@ public class AppointmentService {
         appointment.setDoctor(doctor);
         appointment.setAppointmentDate(appointmentDate); // Set start time
         appointment.setAppointmentEndTime(appointmentEndTime); // Set end time
+        appointment.setPaid(paid);
 
         appointment.setDoctorName(doctor.getDoctorName());
         appointment.setPatientName(patient.getPatientName());
@@ -80,6 +82,7 @@ public class AppointmentService {
         existingAppointment.setDoctor(updatedAppointment.getDoctor());
         existingAppointment.setAppointmentDate(updatedAppointment.getAppointmentDate());
         existingAppointment.setAppointmentEndTime(updatedAppointment.getAppointmentEndTime());
+        existingAppointment.setPaid(updatedAppointment.getPaid());
 
         existingAppointment.setDoctorName(updatedAppointment.getDoctor().getDoctorName());
         existingAppointment.setPatientName(updatedAppointment.getPatient().getPatientName());

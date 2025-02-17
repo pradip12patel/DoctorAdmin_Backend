@@ -58,7 +58,6 @@ public class DoctorDetailData {
                     patientData.put("address", patient.getAddress());
                     patientData.put("phone", patient.getPhone());
                     patientData.put("lastVisit", patient.getLastVisit());
-                    patientData.put("paid", patient.getPaid());
                     patientData.put("ImageUrl", patient.getImageURL());
 
                     // Filter appointments for the specific doctor and patient
@@ -68,6 +67,7 @@ public class DoctorDetailData {
                             Map<String, Object> appointmentData = new LinkedHashMap<>();
                             appointmentData.put("appointmentId", patientAppointment.getId().toString());
                             appointmentData.put("appointmentSlot", patientAppointment.getFormattedAppointmentDate());
+                            appointmentData.put("paid", patientAppointment.getPaid());
                             filteredAppointments.add(appointmentData);
                         }
                     }

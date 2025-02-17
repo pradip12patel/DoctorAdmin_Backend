@@ -28,6 +28,7 @@ public interface DoctorRepository extends JpaRepository<Doctor,UUID> {
         "d.experience_years AS experience_years, " +
         "a.appointment_start_time AS AppointmentStart, " +
         "a.appointment_end_time AS AppointmentEnd, " +
+        "a.paid AS patientPaid, " +
         "a.id AS appointmentID, " +
         "p.id AS patientId, " +
         "p.patient_name AS patientName, " +
@@ -35,7 +36,6 @@ public interface DoctorRepository extends JpaRepository<Doctor,UUID> {
         "p.address AS patientAddress, " +
         "p.phone AS patientPhone, " +
         "p.last_visit AS lastVisit, " +
-        "p.paid AS patientPaid, " +
         "p.imageurl AS imageurlPatient, " +
         "r.id AS reviewId, " +
         "r.description AS reviewContent, " +

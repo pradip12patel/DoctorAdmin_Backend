@@ -78,7 +78,6 @@ public class PatientServiceIMPL implements PatientService{
         existingPatient.setAddress(patient.getAddress());
         existingPatient.setPhone(patient.getPhone());
         existingPatient.setLastVisit(patient.getLastVisit());
-        existingPatient.setPaid(patient.getPaid());
      //   existingPatient.setApointmentSlot(patient.getApointmentSlot()); 
         existingPatient.setImageURL(patient.getImageURL());  
 

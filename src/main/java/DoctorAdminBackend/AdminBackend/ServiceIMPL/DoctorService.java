@@ -134,28 +134,28 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
                 .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + doctorId));
 
         // Calculate total earnings for the doctor
-        double totalEarnings = calculateTotalEarnings(doctor);
+     //   double totalEarnings = calculateTotalEarnings(doctor);
 
         // Update the doctor's earnings
-        doctor.setEarnings(totalEarnings);
+    //    doctor.setEarnings(totalEarnings);
 
         // Save the updated doctor entity
         return doctorRepository.save(doctor);
     }
 
-    private double calculateTotalEarnings(Doctor doctor) {
-        double totalEarnings = 0.0;
+    // private double calculateTotalEarnings(Doctor doctor) {
+    //     double totalEarnings = 0.0;
     
-        // Iterate through the doctor's appointments and sum the paid amounts from associated patients
-        for (Appointment appointment : doctor.getAppointments()) {
-            PatientModel patient = appointment.getPatient();
-            if (patient != null) { // Ensure patient is not null
-                totalEarnings += patient.getPaid();
-            }
-        }
+    //     // Iterate through the doctor's appointments and sum the paid amounts from associated patients
+    //     for (Appointment appointment : doctor.getAppointments()) {
+    //         PatientModel patient = appointment.getPatient();
+    //         if (patient != null) { // Ensure patient is not null
+    //             totalEarnings += patient.getPaid();
+    //         }
+    //     }
     
-        return totalEarnings;
-    }
+    //     return totalEarnings;
+    // }
     
 
     public Doctor updateIsFeature(UUID doctorId, boolean isFeature) {

@@ -48,8 +48,7 @@ public class PatientModel {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate lastVisit;
 
-    @Column(name = "paid", nullable = false)
-    private double paid;
+    
 
     @Column(name = "imageurl")
     private String imageurl = "http://localhost:8086/uploads/bydefault.jpg";
@@ -155,13 +154,7 @@ public class PatientModel {
     //     this.apointmentslot = String.format("%s, %s - %s", date, startTime, endTime);
     // }
 
-    public double getPaid() {
-        return paid;
-    }
-
-    public void setPaid(double paid) {
-        this.paid = paid;
-    }
+    
 
     public String getImageURL() {
         return  imageurl;

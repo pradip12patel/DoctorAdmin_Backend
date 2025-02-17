@@ -16,6 +16,7 @@ import DoctorAdminBackend.AdminBackend.Model.Appointment;
 import DoctorAdminBackend.AdminBackend.Model.Doctor;
 import DoctorAdminBackend.AdminBackend.Model.PatientModel;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.AppointmentService;
+import DoctorAdminBackend.AdminBackend.Reposotiry.AppointmentRepository;
 import DoctorAdminBackend.AdminBackend.Reposotiry.DoctorRepository;
 import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 
@@ -32,63 +33,80 @@ public class AppointmentController {
 
     @Autowired
     private DoctorRepository doctorRepository;
-   
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+    
     @PostMapping("/book")
     public ResponseEntity<Object> bookAppointment(@RequestBody Appointment request) {
-
-        // Ensure patient, doctor, appointment date, and appointment end time are not null
-        if (request.getPatient() == null || request.getDoctor() == null || request.getAppointmentDate() == null || request.getAppointmentEndTime() == null) {
-            throw new IllegalArgumentException("Patient, Doctor, Appointment Date, and Appointment End Time must not be null");
+    
+        // Validate required fields
+        if (request.getPatient() == null || request.getDoctor() == null ||
+            request.getAppointmentDate() == null || request.getAppointmentEndTime() == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "status", "400",
+                "message", "Patient, Doctor, Appointment Date, Appointment End Time, and Paid amount must not be null"
+            ));
         }
-
-        // Fetch the patient and doctor from the repository
+    
+        // Fetch patient and doctor from the repository
         PatientModel patient = fetchPatientById(request.getPatient().getId());
         Doctor doctor = fetchDoctorById(request.getDoctor().getId());
-
-        if (patient == null || doctor == null) {
-            throw new IllegalArgumentException("Patient or Doctor not found");
+    
+        if (patient == null) {
+            return ResponseEntity.status(404).body(Map.of(
+                "status", "404",
+                "message", "Patient not found"
+            ));
         }
-
-        // Call the service to book the appointment
-        Appointment appointment = appointmentService.bookAppointment(patient, doctor, request.getAppointmentDate(), request.getAppointmentEndTime());
-
-        // Prepare the response map with the message at the top using LinkedHashMap
+    
+        if (doctor == null) {
+            return ResponseEntity.status(404).body(Map.of(
+                "status", "404",
+                "message", "Doctor not found"
+            ));
+        }
+    
+        // Create and save the appointment
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setDoctorName(doctor.getDoctorName());
+        appointment.setPatientName(patient.getPatientName());
+        appointment.setAppointmentDate(request.getAppointmentDate());
+        appointment.setAppointmentEndTime(request.getAppointmentEndTime());
+        appointment.setPaid(request.getPaid());
+    
+        // Ensure persistence
+        appointment = appointmentRepository.saveAndFlush(appointment);  // Force immediate database commit
+    
+        // Prepare response
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", "200");
+        response.put("status", "201");
         response.put("message", "Appointment booked successfully");
-
-        // Add doctor details in a serial format
-        List<Map<String, Object>> doctorDetails = new ArrayList<>();
-        Map<String, Object> doctorInfo = new LinkedHashMap<>();
-        doctorInfo.put("doctorId", doctor.getId());
-        doctorInfo.put("doctorName", doctor.getDoctorName());
-        doctorDetails.add(doctorInfo);
-        response.put("doctor", doctorDetails);
-
-        // Add patient details with their appointments inside the patient array
-        List<Map<String, Object>> patientAppointments = new ArrayList<>();
-        Map<String, Object> patientInfo = new LinkedHashMap<>();
-        patientInfo.put("patientId", patient.getId());
-        patientInfo.put("patientName", patient.getPatientName());
-
-        // Collect appointments for the patient
-        List<Map<String, Object>> appointments = new ArrayList<>();
-        for (Appointment app : doctor.getAppointments()) {
-            Map<String, Object> appointmentDetails = new LinkedHashMap<>();
-            appointmentDetails.put("appointmentId", app.getId());
-            appointmentDetails.put("appointmentDate", app.getFormattedAppointmentDate()); // Assuming you have a `getFormattedAppointmentDate` method
-            appointments.add(appointmentDetails);
-        }
-        patientInfo.put("appointments", appointments);
-        patientAppointments.add(patientInfo);
-
-        // Add patient details to the response
-        response.put("patients", patientAppointments);
-
-        // Return the response with status 201 Created and the full details
+    
+        // Add doctor details
+        response.put("doctor", Map.of(
+            "doctorId", doctor.getId(),
+            "doctorName", doctor.getDoctorName()
+        ));
+    
+        // Add patient details with the newly created appointment
+        response.put("patient", Map.of(
+            "patientId", patient.getId(),
+            "patientName", patient.getPatientName(),
+            "appointment", Map.of(
+                "appointmentId", appointment.getId(),
+                "paid", appointment.getPaid(),
+                "appointmentDate", appointment.getFormattedAppointmentDate(),
+                "appointmentEndTime", appointment.getAppointmentEndTime()
+            )
+        ));
+    
+        // Return response with HTTP status 201 (Created)
         return ResponseEntity.status(201).body(response);
     }
-
+    
     private PatientModel fetchPatientById(UUID id) {
         return patientRepository.findById(id).orElse(null); // Fetch patient from the database
     }

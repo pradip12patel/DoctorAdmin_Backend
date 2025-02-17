@@ -45,7 +45,6 @@ public class PatientController {
 		   System.out.println("Patient_name: " + pro.getPatientName());
 	       System.out.println("address: " + pro.getAddress());
 	       System.out.println("age: " + pro.getAge());
-	       System.out.println("paid: " + pro.getPaid());
 	       System.out.println("phone: " + pro.getPhone());
            System.out.println("last_visit" + pro.getLastVisit());
 	       
@@ -68,7 +67,6 @@ public class PatientController {
         patientData.put("age", patient.getAge());
         patientData.put("address", patient.getAddress());
         patientData.put("phone", patient.getPhone());
-        patientData.put("paid", patient.getPaid());
         patientData.put("ImageUrl", patient.getImageURL());
         patientData.put("lastVisit", patient.getLastVisit());
         return patientData;
