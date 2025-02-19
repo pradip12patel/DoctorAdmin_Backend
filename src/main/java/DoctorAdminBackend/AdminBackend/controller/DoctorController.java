@@ -30,6 +30,7 @@ import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorDetailData;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.FileStorageService;
+import DoctorAdminBackend.AdminBackend.ServiceIMPL.JsonDataService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.PatientServiceIMPL;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -44,6 +45,7 @@ public class DoctorController {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final DoctorDetailData doctorDetailData;
+    private final JsonDataService jsonDataService;
 
     @Autowired
     public DoctorController(
@@ -52,7 +54,8 @@ public class DoctorController {
         FileStorageService fileStorageService, 
         DoctorRepository doctorRepository, 
         PatientRepository patientRepository,
-        DoctorDetailData doctorDetailData
+        DoctorDetailData doctorDetailData,
+        JsonDataService jsonDataService
     ) {
         this.doctorService = doctorService;
         this.patientService = patientService;
@@ -60,6 +63,7 @@ public class DoctorController {
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.doctorDetailData= doctorDetailData;
+        this.jsonDataService = jsonDataService;
     }
 
     
@@ -74,6 +78,12 @@ public class DoctorController {
 
         return ResponseEntity.ok(response);
     }
+
+    // @GetMapping("/doctor-with-patients")
+    // public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
+    //     Map<String, Object> data = jsonDataService.readJsonData();
+    //     return ResponseEntity.ok(data);
+    // }
 
     @GetMapping("/doctor/{id}")
     public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) {

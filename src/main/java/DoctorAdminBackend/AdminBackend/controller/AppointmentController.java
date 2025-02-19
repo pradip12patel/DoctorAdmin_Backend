@@ -166,7 +166,7 @@ public ResponseEntity<Map<String, Object>> getAppointmentById(@PathVariable UUID
         Appointment appointment = appointmentService.getAppointmentById(appointmentId);
         
         if (appointment == null) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // Fetch the associated patient
@@ -199,7 +199,7 @@ public ResponseEntity<Map<String, Object>> getAppointmentById(@PathVariable UUID
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     } catch (IllegalArgumentException ex) {
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
 
