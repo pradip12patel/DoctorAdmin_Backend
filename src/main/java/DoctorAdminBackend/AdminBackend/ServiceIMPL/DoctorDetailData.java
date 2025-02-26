@@ -29,72 +29,83 @@ public class DoctorDetailData {
         List<Doctor> doctors = doctorRepository.findAll();
 
     List<Map<String, Object>> result = new ArrayList<>();
-        for (Doctor doctor : doctors) {
-            Map<String, Object> doctorData = new LinkedHashMap<>();
-            doctorData.put("doctorId", doctor.getId().toString());
-            doctorData.put("doctorName", doctor.getDoctorName());
-            doctorData.put("specialization", doctor.getSpecialization());
-            doctorData.put("memberSince", doctor.getMemberSince());
-            doctorData.put("earnings", doctor.getEarnings());
-            doctorData.put("address", doctor.getAddress());
-            doctorData.put("status", doctor.getStatus());
-            doctorData.put("email", doctor.getEmail());
-            doctorData.put("certification", doctor.getcertification());
-            doctorData.put("about", doctor.getabout());
-            doctorData.put("experience_years", doctor.getExperienceYears());
-            doctorData.put("ImageUrl", doctor.getImageURL());
-            doctorData.put("isFeature", doctor.isFeature());
+    for (Doctor doctor : doctors) {
+        Map<String, Object> doctorData = new LinkedHashMap<>();
+        doctorData.put("doctorId", doctor.getId().toString());
+        doctorData.put("doctorName", doctor.getDoctorName());
+        doctorData.put("specialization", doctor.getSpecialization());
+        doctorData.put("memberSince", doctor.getMemberSince());
+     // doctorData.put("earnings", doctor.getEarnings());
+        doctorData.put("address", doctor.getAddress());
+        doctorData.put("status", doctor.getStatus());
+        doctorData.put("email", doctor.getEmail());
+        doctorData.put("certification", doctor.getcertification());
+        doctorData.put("about", doctor.getabout());
+        doctorData.put("experience_years", doctor.getExperienceYears());
+        doctorData.put("ImageUrl", doctor.getImageURL());
+        doctorData.put("isFeature", doctor.isFeature());
+    
+        double Earnings = 0.0;
+    
+        // Map patients associated with the doctor through appointments
+        List<Map<String, Object>> patients = new ArrayList<>();
+        for (Appointment appointment : doctor.getAppointments()) {
+            PatientModel patient = appointment.getPatient();
+    
+            if (patient != null) { // Ensure patient is not null
+                Map<String, Object> patientData = new LinkedHashMap<>();
+                patientData.put("patientId", patient.getId().toString());
+                patientData.put("patientName", patient.getPatientName());
+                patientData.put("age", patient.getAge());
+                patientData.put("address", patient.getAddress());
+                patientData.put("phone", patient.getPhone());
+                patientData.put("lastVisit", patient.getLastVisit());
+                patientData.put("ImageUrl", patient.getImageURL());
+    
+                // Filter appointments for the specific doctor and patient
+                List<Map<String, Object>> filteredAppointments = new ArrayList<>();
+                for (Appointment patientAppointment : patient.getAppointments()) {
+                    if (patientAppointment.getDoctor().getId().equals(doctor.getId())) {
+                        Map<String, Object> appointmentData = new LinkedHashMap<>();
+                        appointmentData.put("appointmentId", patientAppointment.getId().toString());
+                        appointmentData.put("appointmentSlot", patientAppointment.getFormattedAppointmentDate());
+                        appointmentData.put("paid", patientAppointment.getPaid());
+                        filteredAppointments.add(appointmentData);
+                        
+                        Double paidAmount = patientAppointment.getPaid();
+                         if (paidAmount != null) {
+                            Earnings += paidAmount;
+                             }
 
-            // Map patients associated with the doctor through appointments
-            List<Map<String, Object>> patients = new ArrayList<>();
-            for (Appointment appointment : doctor.getAppointments()) {
-                PatientModel patient = appointment.getPatient();
-
-                if (patient != null) { // Ensure patient is not null
-                    Map<String, Object> patientData = new LinkedHashMap<>();
-                    patientData.put("patientId", patient.getId().toString());
-                    patientData.put("patientName", patient.getPatientName());
-                    patientData.put("age", patient.getAge());
-                    patientData.put("address", patient.getAddress());
-                    patientData.put("phone", patient.getPhone());
-                    patientData.put("lastVisit", patient.getLastVisit());
-                    patientData.put("ImageUrl", patient.getImageURL());
-
-                    // Filter appointments for the specific doctor and patient
-                    List<Map<String, Object>> filteredAppointments = new ArrayList<>();
-                    for (Appointment patientAppointment : patient.getAppointments()) {
-                        if (patientAppointment.getDoctor().getId().equals(doctor.getId())) {
-                            Map<String, Object> appointmentData = new LinkedHashMap<>();
-                            appointmentData.put("appointmentId", patientAppointment.getId().toString());
-                            appointmentData.put("appointmentSlot", patientAppointment.getFormattedAppointmentDate());
-                            appointmentData.put("paid", patientAppointment.getPaid());
-                            filteredAppointments.add(appointmentData);
-                        }
                     }
-
-                    patientData.put("appointments", filteredAppointments);
-
-                    // Fetch reviews for the specific doctor-patient relationship
-                    List<Map<String, Object>> reviews = new ArrayList<>();
-                    List<Review> doctorReviews = reviewRepository.findByDoctorAndPatient(doctor, patient);
-                    for (Review review : doctorReviews) {
-                        Map<String, Object> reviewData = new LinkedHashMap<>();
-                        reviewData.put("id", review.getId().toString());
-                        reviewData.put("Description", review.getDescription());
-                        reviewData.put("rating", review.getRating());
-                        reviews.add(reviewData);
-                    }
-
-                    patientData.put("reviews", reviews); // Add reviews to the patient data
-                    patients.add(patientData);
                 }
+    
+                patientData.put("appointments", filteredAppointments);
+    
+                // Fetch reviews for the specific doctor-patient relationship
+                List<Map<String, Object>> reviews = new ArrayList<>();
+                List<Review> doctorReviews = reviewRepository.findByDoctorAndPatient(doctor, patient);
+                for (Review review : doctorReviews) {
+                    Map<String, Object> reviewData = new LinkedHashMap<>();
+                    reviewData.put("id", review.getId().toString());
+                    reviewData.put("Description", review.getDescription());
+                    reviewData.put("rating", review.getRating());
+                    reviews.add(reviewData);
+                }
+    
+                patientData.put("reviews", reviews); // Add reviews to the patient data
+                patients.add(patientData);
             }
-
-            doctorData.put("patients", patients);
-            result.add(doctorData);
         }
-
-        return result;
+    
+        doctorData.put("Earnings", Earnings); // Add total earnings to doctor data
+        doctorData.put("patients", patients);
+        result.add(doctorData);
     }
     
-}
+              return result;
+    
+               }
+
+   }
+

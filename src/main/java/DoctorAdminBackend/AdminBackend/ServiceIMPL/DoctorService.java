@@ -35,28 +35,6 @@ public class DoctorService implements DoctorAdminBackend.AdminBackend.Service.Do
         return doctorRepository.save(doctor);
     }
 
-     public String saveAddress(UUID doctorId, String addressJson) {
-        Optional<Doctor> doctorOptional = doctorRepository.findById(doctorId);
-
-        if (doctorOptional.isEmpty()) {
-            throw new EntityNotFoundException("Doctor not found with ID: " + doctorId);
-        }
-
-        Doctor doctor = doctorOptional.get();
-
-        try {
-            // Convert String to JsonNode
-            JsonNode addressNode = objectmapper.readTree(addressJson);
-            String normalizedAddressJson = objectmapper.writeValueAsString(addressNode);
-            
-            doctor.setAddress(normalizedAddressJson);
-            doctorRepository.save(doctor);
-
-            return "Address saved successfully";
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid JSON format for address", e);
-        }
-    }
 
     @Override
     public Doctor getDoctorbyId(UUID id)  {
