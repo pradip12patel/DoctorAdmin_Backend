@@ -1,6 +1,7 @@
 package DoctorAdminBackend.AdminBackend.controller;
 
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
- 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
@@ -30,7 +34,6 @@ import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorDetailData;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.DoctorService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.FileStorageService;
-import DoctorAdminBackend.AdminBackend.ServiceIMPL.JsonDataService;
 import DoctorAdminBackend.AdminBackend.ServiceIMPL.PatientServiceIMPL;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -45,7 +48,6 @@ public class DoctorController {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final DoctorDetailData doctorDetailData;
-    private final JsonDataService jsonDataService;
 
     @Autowired
     public DoctorController(
@@ -54,8 +56,7 @@ public class DoctorController {
         FileStorageService fileStorageService, 
         DoctorRepository doctorRepository, 
         PatientRepository patientRepository,
-        DoctorDetailData doctorDetailData,
-        JsonDataService jsonDataService
+        DoctorDetailData doctorDetailData
     ) {
         this.doctorService = doctorService;
         this.patientService = patientService;
@@ -63,14 +64,13 @@ public class DoctorController {
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.doctorDetailData= doctorDetailData;
-        this.jsonDataService = jsonDataService;
     }
 
     
     @GetMapping("/doctor-with-patients")
     public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
         List<Map<String, Object>> doctorsWithPatients = doctorDetailData.getDoctorsWithPatients();
-
+         savedatajson(doctorsWithPatients);
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
         response.put("message", "Doctors and their associated patients retrieved successfully");
@@ -79,11 +79,18 @@ public class DoctorController {
         return ResponseEntity.ok(response);
     }
 
-    // @GetMapping("/doctor-with-patients")
-    // public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
-    //     Map<String, Object> data = jsonDataService.readJsonData();
-    //     return ResponseEntity.ok(data);
-    // }
+   void savedatajson(List<Map<String, Object>> jsondata) {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule()); 
+
+    try {
+        File savefile = new File("jsondata.json");
+        mapper.writeValue(savefile, jsondata);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+    
 
     @GetMapping("/doctor/{id}")
     public ResponseEntity<Map<String, Object>> getDoctorById(@PathVariable UUID id) {
