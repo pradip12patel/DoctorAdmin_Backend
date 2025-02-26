@@ -70,26 +70,31 @@ public class DoctorController {
     @GetMapping("/doctor-with-patients")
     public ResponseEntity<Map<String, Object>> getDoctorsWithPatients() {
         List<Map<String, Object>> doctorsWithPatients = doctorDetailData.getDoctorsWithPatients();
-         savedatajson(doctorsWithPatients);
+        
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
         response.put("message", "Doctors and their associated patients retrieved successfully");
         response.put("data", doctorsWithPatients);
-
+    
+        savedatajson(response);
+    
+        // Return the response
         return ResponseEntity.ok(response);
     }
-
-   void savedatajson(List<Map<String, Object>> jsondata) {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule()); 
-
-    try {
-        File savefile = new File("jsondata.json");
-        mapper.writeValue(savefile, jsondata);
-    } catch (Exception e) {
-        e.printStackTrace();
+    
+    void savedatajson(Map<String, Object> jsondata) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule()); 
+    
+        try {
+            File savefile = new File("jsondata.json");
+            mapper.writeValue(savefile, jsondata);
+            System.out.println("JSON data saved successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
+    
     
 
     @GetMapping("/doctor/{id}")
