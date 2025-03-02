@@ -82,14 +82,14 @@ public class DoctorController {
         return ResponseEntity.ok(response);
     }
     
-    void savedatajson(Map<String, Object> jsondata) {
+    void savedatajson(Map<String, Object> JsonData) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule()); 
     
         try {
             File savefile = new File("jsondata.json");
-            mapper.writeValue(savefile, jsondata);
-            System.out.println("JSON data saved successfully.");
+            mapper.writeValue(savefile, JsonData);
+            System.out.println("-----JSON data saved successfully-----");
         } catch (Exception e) {
             e.printStackTrace();
         }
