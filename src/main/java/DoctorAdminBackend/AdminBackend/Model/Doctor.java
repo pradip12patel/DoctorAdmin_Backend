@@ -3,18 +3,15 @@ package DoctorAdminBackend.AdminBackend.Model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.hibernate.annotations.GenericGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -54,8 +51,7 @@ public class Doctor {
     @Column(name = "imageurl")
     private String imageurl;
 
-    // **Address as JSON**
-    @Column(name = "address")
+    @Column(name = "address", columnDefinition = "jsonb")
     private String address;
 
     @Column(name = "emailId")
