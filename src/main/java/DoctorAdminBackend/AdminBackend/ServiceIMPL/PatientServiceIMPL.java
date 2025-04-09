@@ -17,7 +17,7 @@ import DoctorAdminBackend.AdminBackend.Reposotiry.PatientRepository;
 import DoctorAdminBackend.AdminBackend.Service.PatientService;
 
 @Service
-public class PatientServiceIMPL implements PatientService{
+public class PatientServiceIMPL implements PatientService     {
 
      @Autowired
     public PatientRepository patientRepository;
